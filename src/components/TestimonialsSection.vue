@@ -1,0 +1,179 @@
+<script setup>
+const reviews = [
+  {
+    text: "Caravan Chicken bilan ishlay boshlaganimizdan beri ta'minot uzilishini umuman ko'rmadik. Sifat barqaror.",
+    name: 'Akmal Karimov',
+    company: '"Osh Markazi" restorani',
+  },
+  {
+    text: 'Halollik kafolati biz uchun eng muhim. Mijozlarimizga ishonch bilan taklif qilamiz.',
+    name: 'Dilnoza Yusupova',
+    company: '"Family Cafe"',
+  },
+  {
+    text: 'Yarim tayyor mahsulotlar menyumizni tezlashtirdi — buyurtma 6 daqiqada tayyor.',
+    name: 'Sardor Aliyev',
+    company: '"Tez Lunch" fastfood',
+  },
+]
+</script>
+
+<template>
+  <section class="reviews">
+    <div class="container">
+      <header v-reveal class="reviews__head">
+        <p class="eyebrow">Mijozlar fikri</p>
+        <h2 class="section-title reviews__title">Bizga ishongan brendlar nima deydi?</h2>
+      </header>
+
+      <div class="reviews__grid">
+        <article
+          v-for="(r, i) in reviews"
+          :key="r.name"
+          v-scroll3d="{ tilt: 6 }"
+          v-reveal3d.cascade="i * 110"
+          class="review"
+        >
+          <div class="review__top">
+            <div class="review__stars" aria-label="5 yulduz">
+              <svg v-for="n in 5" :key="n" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9 6.8 19l1-5.8L3.6 9.1l5.8-.8L12 3Z" />
+              </svg>
+            </div>
+            <span class="review__logo">LOGO</span>
+          </div>
+          <p class="review__text">"{{ r.text }}"</p>
+          <div class="review__author">
+            <span class="review__avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6" />
+                <path d="M5.5 19c.7-3.2 3.3-5 6.5-5s5.8 1.8 6.5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </span>
+            <span class="review__who">
+              <strong>{{ r.name }}</strong>
+              <span>{{ r.company }}</span>
+            </span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.reviews {
+  background: var(--cream);
+  padding: 96px 0;
+}
+
+.reviews__head {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.reviews__title {
+  margin-top: 10px;
+  color: #2b1d14;
+}
+
+.reviews__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.review {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.review__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.review__stars {
+  display: inline-flex;
+  gap: 4px;
+  color: var(--orange);
+}
+
+.review__stars svg {
+  width: 18px;
+  height: 18px;
+}
+
+.review__logo {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--muted-2);
+  background: var(--card-cream);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+}
+
+.review__text {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 28px;
+  flex: 1;
+}
+
+.review__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--card-cream);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.review__avatar svg {
+  width: 24px;
+  height: 24px;
+}
+
+.review__who {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.review__who strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.review__who span {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .reviews__grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
+</style>
