@@ -1,25 +1,109 @@
+/* Inter (body / label / button) — pulled from Google Fonts.
+   No Inter files were present in src/assets/font/static, so this is a
+   bridge: drop Inter .ttf files in and swap to @font-face for full self-hosting.
+   NOTE: @import must stay at the very top of the file. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ------------------------------------------------------------------ *
+ * Bricolage Grotesque — self-hosted static weights (display + heading)
+ * ------------------------------------------------------------------ */
 @font-face {
   font-family: 'Bricolage Grotesque';
-  src: url('./assets/font/BricolageGrotesque_SemiCondensed-Regular.ttf') format('truetype');
-  font-weight: 100 900;
+  src: url('./assets/font/static/BricolageGrotesque-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./assets/font/static/BricolageGrotesque-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./assets/font/static/BricolageGrotesque-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./assets/font/static/BricolageGrotesque-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./assets/font/static/BricolageGrotesque-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./assets/font/static/BricolageGrotesque-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./assets/font/static/BricolageGrotesque-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  /* Brand */
-  --orange: #f2580c;
-  --orange-strong: #d94c08;
-  --orange-soft: #f6904f;
-  --cream: #fdf3e8;
-  --cream-2: #fbeede;
-  --card-cream: #fcefe0;
+  /* ---- Palette (raw tokens, from the brand color sheet) ---- */
+  --orange-50: #fff1e8;
+  --orange-100: #ffe0cc;
+  --orange-300: #ff9a5c;
+  --orange-400: #fb7a33;
+  --orange-500: #f2580c;
+  --orange-600: #d2480a;
+  --orange-700: #a8390a;
 
-  --ink: #1e1814;
-  --ink-soft: #3a322c;
-  --muted: #7c7167;
-  --muted-2: #9a9088;
-  --line: #ece3d8;
+  --cream-50: #fffaf3;
+  --cream-100: #fff6ec;
+  --cream-200: #fff3e6;
+  --cream-300: #fbe9d6;
+  --cream-400: #f3d9bf;
+
+  --bordo-700: #5a1414;
+  --bordo-800: #4a0e0e;
+  --bordo-900: #3e0a0a;
+  --bordo-950: #2a0606;
+
+  --coal-900: #1f1a17;
+  --coal-700: #4a423c;
+  --coal-500: #8a817a;
+  --coal-300: #c9c0b8;
+  --coal-100: #ece6df;
+
+  --green-600: #2e7d32;
+  --gold-500: #e8b04b;
+
+  /* ---- Type families ---- */
+  --font-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* ---- Semantic aliases (kept so existing components don't break) ---- */
+  --orange: var(--orange-500);
+  --orange-strong: var(--orange-600);
+  --orange-soft: var(--orange-300);
+  --cream: var(--cream-200);
+  --cream-2: var(--cream-300);
+  --card-cream: var(--cream-100);
+
+  --ink: var(--coal-900);
+  --ink-soft: var(--coal-700);
+  --muted: var(--coal-500);
+  --muted-2: var(--coal-300);
+  --line: var(--coal-100);
   --white: #ffffff;
 
   --radius-sm: 12px;
@@ -44,12 +128,20 @@ html {
 }
 
 body {
-  font-family: 'Bricolage Grotesque', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
   color: var(--ink);
   background: var(--white);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Headings & display numerals use Bricolage Grotesque per the type spec */
+h1, h2, h3, h4, h5, h6,
+.section-title,
+.stat__value,
+.stat-number {
+  font-family: var(--font-display);
 }
 
 img {

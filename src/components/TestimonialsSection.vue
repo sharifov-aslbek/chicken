@@ -109,6 +109,48 @@ const reviews = [
 .review__stars svg {
   width: 18px;
   height: 18px;
+  transform-origin: center;
+  transition:
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.25s ease;
+}
+
+/* staggered "pop + spin-in" once the card reveals */
+.review.is-revealed .review__stars svg {
+  animation: star-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.review.is-revealed .review__stars svg:nth-child(1) { animation-delay: 0.12s; }
+.review.is-revealed .review__stars svg:nth-child(2) { animation-delay: 0.24s; }
+.review.is-revealed .review__stars svg:nth-child(3) { animation-delay: 0.36s; }
+.review.is-revealed .review__stars svg:nth-child(4) { animation-delay: 0.48s; }
+.review.is-revealed .review__stars svg:nth-child(5) { animation-delay: 0.6s; }
+
+@keyframes star-pop {
+  0% { opacity: 0; transform: scale(0) rotate(-90deg); }
+  55% { opacity: 1; transform: scale(1.35) rotate(12deg); }
+  75% { transform: scale(0.9) rotate(-4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* hover: stars lift in a little wave and glow */
+.review:hover .review__stars svg {
+  transform: scale(1.2) rotate(-8deg);
+  filter: drop-shadow(0 2px 5px rgba(242, 88, 12, 0.55));
+}
+.review:hover .review__stars svg:nth-child(1) { transition-delay: 0s; }
+.review:hover .review__stars svg:nth-child(2) { transition-delay: 0.05s; }
+.review:hover .review__stars svg:nth-child(3) { transition-delay: 0.1s; }
+.review:hover .review__stars svg:nth-child(4) { transition-delay: 0.15s; }
+.review:hover .review__stars svg:nth-child(5) { transition-delay: 0.2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .review.is-revealed .review__stars svg {
+    animation: none;
+  }
+  .review:hover .review__stars svg {
+    transform: none;
+    filter: none;
+  }
 }
 
 .review__logo {

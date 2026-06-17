@@ -93,14 +93,16 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
   font-size: clamp(38px, 4vw, 52px);
   font-weight: 800;
   line-height: 1;
-  color: var(--orange-strong);
+  color: #f2580c;
   letter-spacing: -0.02em;
   margin-bottom: 12px;
 }
 
 .stat__label {
   font-size: 15px;
-  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: #4a423c;
   max-width: 180px;
 }
 

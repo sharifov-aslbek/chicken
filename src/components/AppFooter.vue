@@ -2,12 +2,12 @@
 import BrandLogo from './BrandLogo.vue'
 
 const pages = [
-  { label: 'Bosh sahifa', href: '#home' },
-  { label: 'Mahsulotlar', href: '#products' },
-  { label: 'Biz haqimizda', href: '#about' },
-  { label: 'Jarayon', href: '#process' },
-  { label: 'Savollar', href: '#faq' },
-  { label: "Bog'lanish", href: '#contact' },
+  { label: 'Bosh sahifa', to: '/' },
+  { label: 'Mahsulotlar', to: '/mahsulotlar' },
+  { label: 'Biz haqimizda', to: '/biz-haqimizda' },
+  { label: 'Jarayon', to: '/#process' },
+  { label: 'Savollar', to: '/#faq' },
+  { label: "Bog'lanish", to: '/boglanish' },
 ]
 
 const socials = ['send', 'instagram', 'facebook', 'youtube']
@@ -47,7 +47,7 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
         <div v-reveal="90" class="footer__col">
           <h3 class="footer__title">Sahifalar</h3>
           <ul>
-            <li v-for="p in pages" :key="p.href"><a :href="p.href">{{ p.label }}</a></li>
+            <li v-for="p in pages" :key="p.to"><router-link :to="p.to">{{ p.label }}</router-link></li>
           </ul>
         </div>
 

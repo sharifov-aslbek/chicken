@@ -1,4 +1,26 @@
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import processImg from '../assets/images/photo-qadoqlash.png'
+
+const stepsEl = ref(null)
+const run = ref(false)
+let observer = null
+
+onMounted(() => {
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        run.value = true
+        observer.disconnect()
+      }
+    },
+    { threshold: 0.35 }
+  )
+  if (stepsEl.value) observer.observe(stepsEl.value)
+})
+
+onBeforeUnmount(() => observer?.disconnect())
+
 const steps = [
   {
     n: 1,
@@ -43,11 +65,11 @@ const steps = [
         </h2>
       </header>
 
-      <ol class="steps">
+      <ol ref="stepsEl" class="steps" :class="{ 'steps--run': run }">
         <li v-for="(s, i) in steps" :key="s.n" v-reveal3d.cascade="i * 110" class="step">
           <div class="step__top">
             <span class="step__num">{{ s.n }}</span>
-            <span v-if="i < steps.length - 1" class="step__line"></span>
+            <span v-if="i < steps.length - 1" class="step__line"><i class="step__fill"></i></span>
           </div>
           <h3 class="step__title">
             <span class="step__icon">
@@ -76,7 +98,7 @@ const steps = [
         </li>
       </ol>
 
-      <div v-reveal3d.pop class="process__photo img-ph" data-label="Qadoqlash liniyasi rasmi"></div>
+      <img v-reveal3d.pop :src="processImg" class="process__photo" alt="Qadoqlash liniyasi" />
     </div>
   </section>
 </template>
@@ -115,12 +137,17 @@ const steps = [
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--orange);
+  background: #f3caa9;
   color: #fff;
   font-weight: 700;
   font-size: 17px;
   position: relative;
   z-index: 2;
+  transform: scale(0.86);
+  transition:
+    background 0.4s ease,
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s ease;
 }
 
 .step__line {
@@ -131,6 +158,54 @@ const steps = [
   border-top: 2px dashed #f1c8a8;
   z-index: 1;
 }
+
+/* solid orange progress fill that draws across each dashed segment */
+.step__fill {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  border-top: 2px solid var(--orange);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s ease;
+}
+
+/* ---- run state: light each node, then fill the segment after it ---- */
+.steps--run .step__num {
+  background: var(--orange);
+  transform: scale(1);
+}
+
+.steps--run .step:nth-child(1) .step__num { transition-delay: 0s; }
+.steps--run .step:nth-child(2) .step__num { transition-delay: 0.5s; }
+.steps--run .step:nth-child(3) .step__num { transition-delay: 1s; }
+.steps--run .step:nth-child(4) .step__num { transition-delay: 1.5s; }
+.steps--run .step:nth-child(5) .step__num { transition-delay: 2s; }
+
+/* a soft pulse ring as each node activates */
+.steps--run .step__num {
+  box-shadow: 0 0 0 0 rgba(242, 88, 12, 0.35);
+  animation: node-pulse 0.6s ease-out both;
+}
+.steps--run .step:nth-child(1) .step__num { animation-delay: 0s; }
+.steps--run .step:nth-child(2) .step__num { animation-delay: 0.5s; }
+.steps--run .step:nth-child(3) .step__num { animation-delay: 1s; }
+.steps--run .step:nth-child(4) .step__num { animation-delay: 1.5s; }
+.steps--run .step:nth-child(5) .step__num { animation-delay: 2s; }
+
+@keyframes node-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(242, 88, 12, 0.45); }
+  100% { box-shadow: 0 0 0 14px rgba(242, 88, 12, 0); }
+}
+
+.steps--run .step__fill {
+  transform: scaleX(1);
+}
+.steps--run .step:nth-child(1) .step__fill { transition-delay: 0.25s; }
+.steps--run .step:nth-child(2) .step__fill { transition-delay: 0.75s; }
+.steps--run .step:nth-child(3) .step__fill { transition-delay: 1.25s; }
+.steps--run .step:nth-child(4) .step__fill { transition-delay: 1.75s; }
 
 .step__title {
   display: flex;
@@ -162,6 +237,23 @@ const steps = [
   width: 100%;
   aspect-ratio: 16 / 6;
   border-radius: var(--radius);
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step__num,
+  .steps--run .step__num {
+    background: var(--orange);
+    transform: none;
+    animation: none;
+    box-shadow: none;
+    transition: none;
+  }
+  .step__fill,
+  .steps--run .step__fill {
+    transform: scaleX(1);
+    transition: none;
+  }
 }
 
 @media (max-width: 900px) {

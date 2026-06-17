@@ -1,15 +1,23 @@
 <script setup>
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 import BrandLogo from './BrandLogo.vue'
 
 const links = [
-  { label: 'Bosh sahifa', href: '#home', active: true },
-  { label: 'Biz haqimizda', href: '#about' },
-  { label: 'Mahsulotlar', href: '#products' },
-  { label: 'Jarayon', href: '#process' },
-  { label: 'Savollar', href: '#faq' },
-  { label: "Bog'lanish", href: '#contact' },
+  { label: 'Bosh sahifa', to: '/' },
+  { label: 'Biz haqimizda', to: '/biz-haqimizda' },
+  { label: 'Mahsulotlar', to: '/mahsulotlar' },
+  { label: 'Jarayon', to: '/#process' },
+  { label: 'Savollar', to: '/#faq' },
+  { label: "Bog'lanish", to: '/boglanish' },
 ]
+
+const route = useRoute()
+function isActive(to) {
+  if (to.startsWith('/#')) return false
+  if (to === '/') return route.path === '/'
+  return route.path === to || route.path.startsWith(to + '/')
+}
 
 const open = ref(false)
 </script>
@@ -21,16 +29,16 @@ const open = ref(false)
         <BrandLogo />
 
         <nav class="nav" :class="{ 'nav--open': open }">
-          <a
+          <router-link
             v-for="link in links"
-            :key="link.href"
-            :href="link.href"
+            :key="link.to"
+            :to="link.to"
             class="nav__link"
-            :class="{ 'nav__link--active': link.active }"
+            :class="{ 'nav__link--active': isActive(link.to) }"
             @click="open = false"
           >
             {{ link.label }}
-          </a>
+          </router-link>
         </nav>
 
         <div class="actions">
@@ -40,7 +48,7 @@ const open = ref(false)
               <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
-          <a href="#partner" class="btn btn-primary">Hamkor bo'lish</a>
+          <router-link to="/boglanish" class="btn btn-primary" @click="open = false">Hamkor bo'lish</router-link>
           <button class="burger" :class="{ 'burger--open': open }" @click="open = !open" aria-label="Menu">
             <span></span><span></span><span></span>
           </button>
