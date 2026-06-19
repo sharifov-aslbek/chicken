@@ -1,36 +1,20 @@
 <script setup>
 import featureImg from '../assets/images/5takuchlitomon.png'
+import { computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
 
-const cards = [
-  {
-    title: "Jo'jalikdan dasturxongacha to'liq nazorat",
-    text: 'Yetishtirishdan qadoqlashgacha — har bir bosqich bizning nazoratimizda.',
-    icon: 'shield',
-  },
-  {
-    title: '5–6 daqiqada tayyor',
-    text: 'Yarim tayyor mahsulotlar — band kunlar, kutilmagan mehmonlar va restoran menyulari uchun ideal yechim.',
-    icon: 'bolt',
-  },
-  {
-    title: 'Uzluksiz, yirik hajmda yetkazib berish',
-    text: "Restoran va kafelar uchun ulgurji va barqaror ta'minot kafolati.",
-    icon: 'truck',
-  },
-  {
-    title: 'Gigiyenik ishlab chiqarish',
-    text: "Zamonaviy uskunalar va qat'iy tozalik standartlari.",
-    icon: 'spark',
-  },
-]
+const { t } = useI18n()
+
+const icons = ['shield', 'bolt', 'truck', 'spark']
+const cards = computed(() => t('why.cards').map((c, i) => ({ ...c, icon: icons[i] })))
 </script>
 
 <template>
   <section class="why">
     <div class="container">
       <header v-reveal class="why__head">
-        <p class="eyebrow">Nega aynan Caravan Chicken?</p>
-        <h2 class="section-title why__title">Bizning 5 ta kuchli tomonimiz</h2>
+        <p class="eyebrow">{{ t('why.eyebrow') }}</p>
+        <h2 class="section-title why__title">{{ t('why.title') }}</h2>
       </header>
 
       <div class="bento">
@@ -43,8 +27,8 @@ const cards = [
             </svg>
           </span>
           <div class="feature-text">
-            <h3>Halol va xalqaro ISO sertifikatlar</h3>
-            <p>Shariy qoidalar asosida mahsulotlar qo'lda so'yiladi — bu bizning asosiy va'damiz.</p>
+            <h3>{{ t('why.featureTitle') }}</h3>
+            <p>{{ t('why.featureText') }}</p>
           </div>
         </article>
 

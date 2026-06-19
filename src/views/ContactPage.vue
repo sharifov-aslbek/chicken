@@ -1,14 +1,13 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
+
+const { t } = useI18n()
 
 const role = ref('b2b')
 
-const cards = [
-  { icon: 'phone', label: 'Telefon', value: '+998 71 200 21 11' },
-  { icon: 'send', label: 'Telegram', value: '@caravan_chicken' },
-  { icon: 'pin', label: 'Manzil', value: "Sergeli tumani, Qumariq MFY, Alisher Navoiy ko'chasi, 11-uy" },
-  { icon: 'clock', label: 'Ish vaqti', value: 'Dushanba–Shanba, 9:00–18:00' },
-]
+const cardIcons = ['phone', 'send', 'pin', 'clock']
+const cards = computed(() => t('contactP.cards').map((c, i) => ({ ...c, icon: cardIcons[i] })))
 
 const sent = ref(false)
 function onSubmit() {
@@ -21,11 +20,10 @@ function onSubmit() {
     <!-- Hero -->
     <div class="hero">
       <div class="container hero__inner">
-        <p v-reveal class="eyebrow">Bog'lanish</p>
-        <h1 v-reveal="80" class="hero__title">Biz bilan bog'laning</h1>
+        <p v-reveal class="eyebrow">{{ t('contactP.eyebrow') }}</p>
+        <h1 v-reveal="80" class="hero__title">{{ t('contactP.title') }}</h1>
         <p v-reveal="160" class="hero__lead">
-          Hamkorlik, ulgurji yoki shaxsiy buyurtma — formani to'ldiring yoki quyidagi
-          kanallar orqali murojaat qiling. Tez orada javob beramiz.
+          {{ t('contactP.lead') }}
         </p>
       </div>
     </div>
@@ -64,58 +62,58 @@ function onSubmit() {
       </div>
 
       <form v-reveal.right="120" class="form" @submit.prevent="onSubmit">
-        <h2 class="form__title">So'rov yuborish</h2>
+        <h2 class="form__title">{{ t('contactP.formTitle') }}</h2>
         <div class="form-row">
           <label class="field">
-            <span class="field__label">Ism</span>
-            <input type="text" placeholder="Ismingizni kiriting" required />
+            <span class="field__label">{{ t('form.name') }}</span>
+            <input type="text" :placeholder="t('form.namePh')" required />
           </label>
           <label class="field">
-            <span class="field__label">Telefon raqami</span>
+            <span class="field__label">{{ t('form.phone') }}</span>
             <input type="tel" placeholder="+998" required />
           </label>
         </div>
 
         <label class="field">
-          <span class="field__label">Korxona / brend nomi</span>
-          <input type="text" placeholder="Restoran yoki do'koningiz nomi" />
+          <span class="field__label">{{ t('form.company') }}</span>
+          <input type="text" :placeholder="t('form.companyPh')" />
         </label>
 
         <div class="field">
-          <span class="field__label">Men:</span>
+          <span class="field__label">{{ t('form.iAm') }}</span>
           <div class="roles">
             <button type="button" class="role" :class="{ 'role--active': role === 'b2b' }" @click="role = 'b2b'">
               <span class="role__dot"></span>
-              Restoran / Kafe (B2B)
+              {{ t('contactP.roleB2b') }}
             </button>
             <button type="button" class="role" :class="{ 'role--active': role === 'b2c' }" @click="role = 'b2c'">
               <span class="role__dot"></span>
-              Oddiy mijoz (B2C)
+              {{ t('contactP.roleB2c') }}
             </button>
           </div>
         </div>
 
         <label class="field">
-          <span class="field__label">Izoh yoki so'rovingiz</span>
-          <textarea rows="4" placeholder="Qo'shimcha ma'lumotlar..."></textarea>
+          <span class="field__label">{{ t('form.comment') }}</span>
+          <textarea rows="4" :placeholder="t('form.commentPh')"></textarea>
         </label>
 
-        <button type="submit" class="btn btn-primary form__submit">So'rov yuborish</button>
+        <button type="submit" class="btn btn-primary form__submit">{{ t('form.submit') }}</button>
         <transition name="fade">
-          <p v-if="sent" class="form__ok">Rahmat! So'rovingiz qabul qilindi — tez orada bog'lanamiz.</p>
+          <p v-if="sent" class="form__ok">{{ t('contactP.ok') }}</p>
         </transition>
       </form>
     </div>
 
     <!-- Map -->
     <div class="container map-wrap">
-      <h2 v-reveal class="map__title">Bizni xaritada toping</h2>
+      <h2 v-reveal class="map__title">{{ t('contactP.mapTitle') }}</h2>
       <div v-reveal="80" class="map field-ph">
         <svg class="field-ph__icon" viewBox="0 0 24 24" fill="none">
           <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
           <path d="M9 4v13M15 6.5v13" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
         </svg>
-        <span class="map__label">Interaktiv xarita shu yerga joylashtiriladi</span>
+        <span class="map__label">{{ t('contactP.mapLabel') }}</span>
       </div>
     </div>
   </section>

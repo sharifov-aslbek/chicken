@@ -1,64 +1,46 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
+import { getCategories } from '../data/products.js'
 
-const filters = [
-  'Yarim tayyor',
-  "Yangi so'yilgan",
-  'Muzlatilgan & qadoqlangan',
-  'Marinadlangan',
-  'Dudlangan',
-]
+const { t } = useI18n()
 
-const active = ref('Yarim tayyor')
+// Category labels (skip "Barchasi"/"Все") reused as filter chips.
+const filters = computed(() => getCategories().slice(1))
+const activeIndex = ref(0)
 
-const products = [
-  {
-    tag: 'Yarim tayyor',
-    title: 'Tovuq naggetslari',
-    text: "Bolalar yaxshi ko'radigan, tez tayyorlanadigan yarim tayyor mahsulot.",
-  },
-  {
-    tag: "Yangi so'yilgan",
-    title: 'Tovuq filesi',
-    text: "Yangi so'yilgan, sof oqsilga boy noziq ko'krak qismi.",
-  },
-  {
-    tag: 'Marinadlangan',
-    title: 'Marinadlangan qanotcha',
-    text: 'Ziravorlarda marinadlangan, grill uchun tayyor.',
-  },
-  {
-    tag: 'Dudlangan',
-    title: 'Dudlangan tovuq son',
-    text: 'Tabiiy dudlangan, dasturxonga tayyor noziklik.',
-  },
-]
+// Each card maps to a tag taken from the same category list so labels stay in sync.
+const cardTags = computed(() => {
+  const c = getCategories()
+  // half, fresh, marinated, smoked
+  return [c[2], c[1], c[3], c[4]]
+})
 
-// Cards are illustrative; show all for now regardless of active tab.
-const visible = computed(() => products)
+const visible = computed(() =>
+  t('prod.cards').map((card, i) => ({ ...card, tag: cardTags.value[i] }))
+)
 </script>
 
 <template>
   <section id="products" class="products">
     <div class="container">
-      <div v-reveal3d.pop class="products__video img-ph" data-label="Mahsulot videosi">
-        <span class="video-badge">▶ Avto-ijro · ovozsiz</span>
+      <div v-reveal3d.pop class="products__video img-ph" :data-label="t('prod.eyebrow')">
+        <span class="video-badge">{{ t('prod.videoBadge') }}</span>
         <span class="video-progress"></span>
       </div>
 
       <div class="products__head">
         <div v-reveal.left>
-          <p class="eyebrow">Mahsulotlar</p>
+          <p class="eyebrow">{{ t('prod.eyebrow') }}</p>
           <h2 class="section-title products__title">
-            Har qanday menyu va oila dasturxoni uchun ideal
+            {{ t('prod.title') }}
           </h2>
           <p class="section-lead">
-            Yangi so'yilgan tovuqning barcha qismlari, yarim tayyor mahsulotlar
-            va keng assortiment — barchasi bir joyda.
+            {{ t('prod.lead') }}
           </p>
         </div>
         <a v-reveal.right="120" href="#all" class="products__all">
-          Barcha mahsulotlar
+          {{ t('prod.all') }}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
             <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
@@ -67,18 +49,18 @@ const visible = computed(() => products)
 
       <div v-reveal class="filters">
         <button
-          v-for="f in filters"
-          :key="f"
+          v-for="(f, i) in filters"
+          :key="i"
           class="filter"
-          :class="{ 'filter--active': f === active }"
-          @click="active = f"
+          :class="{ 'filter--active': i === activeIndex }"
+          @click="activeIndex = i"
         >
           {{ f }}
         </button>
       </div>
 
       <div class="cards">
-        <article v-for="(p, i) in visible" :key="p.title" v-scroll3d class="card">
+        <article v-for="(p, i) in visible" :key="i" v-scroll3d class="card">
           <div v-reveal3d.pop class="card__media img-ph">
             <svg class="card__ph-icon" viewBox="0 0 24 24" fill="none">
               <path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
@@ -89,7 +71,7 @@ const visible = computed(() => products)
             <h3 class="card__title">{{ p.title }}</h3>
             <p class="card__text">{{ p.text }}</p>
             <a href="#detail" class="card__link">
-              Batafsil
+              {{ t('prod.detail') }}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>

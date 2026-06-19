@@ -1,16 +1,35 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { getProduct, relatedProducts } from '../data/products.js'
+import productImg from '../assets/images/StaticProduct.png'
+import { useI18n } from '../i18n/index.js'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const product = computed(() => getProduct(route.params.slug))
-const related = computed(() => relatedProducts(product.value.slug))
+const related = computed(() => relatedProducts(route.params.slug))
 
-const badges = [
-  { icon: 'shield', text: 'Halal sertifikat' },
-  { icon: 'award', text: 'ISO sifat nazorati' },
-]
+// Static gallery — same image repeated so the slider motion is visible.
+const slides = [productImg, productImg, productImg, productImg]
+const active = ref(0)
+
+const go = (i) => {
+  active.value = (i + slides.length) % slides.length
+}
+const next = () => go(active.value + 1)
+const prev = () => go(active.value - 1)
+
+// Reset the slider when navigating between products.
+watch(() => route.params.slug, () => {
+  active.value = 0
+})
+
+const badges = computed(() => [
+  { icon: 'shield', text: t('detail.badgeHalal') },
+  { icon: 'award', text: t('detail.badgeIso') },
+])
 </script>
 
 <template>
@@ -18,9 +37,9 @@ const badges = [
     <div class="container">
       <!-- Breadcrumb -->
       <nav v-reveal class="crumbs">
-        <router-link to="/">Bosh sahifa</router-link>
+        <router-link to="/">{{ t('nav.home') }}</router-link>
         <span>›</span>
-        <router-link to="/mahsulotlar">Mahsulotlar</router-link>
+        <router-link to="/mahsulotlar">{{ t('nav.products') }}</router-link>
         <span>›</span>
         <span class="crumbs__current">{{ product.title }}</span>
       </nav>
@@ -28,19 +47,49 @@ const badges = [
       <!-- Top: gallery + info -->
       <div class="top">
         <div class="gallery">
-          <div v-reveal3d.pop class="gallery__main field-ph">
-            <svg class="field-ph__icon" viewBox="0 0 24 24" fill="none">
-              <path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-          <div class="gallery__thumbs">
-            <div v-for="n in 4" :key="n" v-reveal="n * 70" class="thumb field-ph">
-              <svg viewBox="0 0 24 24" fill="none">
-                <rect x="3.5" y="5" width="17" height="14" rx="2.5" stroke="currentColor" stroke-width="1.6" />
-                <circle cx="9" cy="10" r="1.6" stroke="currentColor" stroke-width="1.6" />
-                <path d="m5 17 4.5-4 3 2.5L16 12l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
-              </svg>
+          <div v-reveal3d.pop class="gallery__stage">
+            <div class="gallery__track" :style="{ transform: `translateX(-${active * 100}%)` }">
+              <div v-for="(img, i) in slides" :key="i" class="gallery__slide">
+                <img :src="img" :alt="product.fullTitle" />
+              </div>
             </div>
+
+            <button class="gallery__nav gallery__nav--prev" type="button" aria-label="Oldingi rasm" @click="prev">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+            <button class="gallery__nav gallery__nav--next" type="button" aria-label="Keyingi rasm" @click="next">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <div class="gallery__dots">
+              <button
+                v-for="(img, i) in slides"
+                :key="i"
+                class="dot"
+                :class="{ 'dot--active': i === active }"
+                type="button"
+                :aria-label="`${i + 1}-rasm`"
+                @click="go(i)"
+              ></button>
+            </div>
+          </div>
+
+          <div class="gallery__thumbs">
+            <button
+              v-for="(img, i) in slides"
+              :key="i"
+              v-reveal="i * 70"
+              class="thumb"
+              :class="{ 'thumb--active': i === active }"
+              type="button"
+              @click="go(i)"
+            >
+              <img :src="img" alt="" />
+            </button>
           </div>
         </div>
 
@@ -57,11 +106,11 @@ const badges = [
           </ul>
 
           <div v-reveal.right="240" class="price">
-            <span class="price__eyebrow">Ulgurji narx</span>
-            <strong class="price__value">Kelishilgan holda — hajmga qarab</strong>
+            <span class="price__eyebrow">{{ t('detail.priceEyebrow') }}</span>
+            <strong class="price__value">{{ t('detail.priceValue') }}</strong>
             <div class="price__actions">
-              <router-link to="/boglanish" class="btn btn-primary">Buyurtma berish</router-link>
-              <router-link to="/boglanish" class="btn btn-white">Narx so'rash</router-link>
+              <router-link to="/boglanish" class="btn btn-primary">{{ t('detail.order') }}</router-link>
+              <router-link to="/boglanish" class="btn btn-white">{{ t('detail.askPrice') }}</router-link>
             </div>
           </div>
 
@@ -85,14 +134,14 @@ const badges = [
     <!-- Detail block -->
     <div class="detail">
       <div class="container">
-        <h2 v-reveal class="detail__title">Mahsulot haqida batafsil</h2>
+        <h2 v-reveal class="detail__title">{{ t('detail.aboutTitle') }}</h2>
         <div class="detail__grid">
           <div v-reveal>
-            <h3 class="detail__sub">Tavsif</h3>
+            <h3 class="detail__sub">{{ t('detail.tavsifTitle') }}</h3>
             <p class="detail__text">{{ product.tavsif }}</p>
           </div>
           <div v-reveal="100">
-            <h3 class="detail__sub">Saqlash va tayyorlash</h3>
+            <h3 class="detail__sub">{{ t('detail.saqlashTitle') }}</h3>
             <p class="detail__text">{{ product.saqlash }}</p>
           </div>
         </div>
@@ -101,7 +150,7 @@ const badges = [
 
     <!-- Related -->
     <div class="related container">
-      <h2 v-reveal class="related__title">O'xshash mahsulotlar</h2>
+      <h2 v-reveal class="related__title">{{ t('detail.relatedTitle') }}</h2>
       <div class="cards">
         <router-link
           v-for="(p, i) in related"
@@ -110,17 +159,15 @@ const badges = [
           v-reveal3d="i * 70"
           class="card"
         >
-          <div class="card__media field-ph">
-            <svg class="field-ph__icon" viewBox="0 0 24 24" fill="none">
-              <path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+          <div class="card__media">
+            <img :src="productImg" :alt="p.title" />
           </div>
           <div class="card__body">
             <span class="card__chip">{{ p.tag }}</span>
             <h3 class="card__title">{{ p.title }}</h3>
             <p class="card__text">{{ p.short }}</p>
             <span class="card__link">
-              Batafsil
+              {{ t('detail.detailLink') }}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -166,9 +213,93 @@ const badges = [
   padding-bottom: 64px;
 }
 
-.gallery__main {
+.gallery__stage {
+  position: relative;
   aspect-ratio: 4 / 3.4;
   border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--card-cream);
+}
+
+.gallery__track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery__slide {
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.gallery__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.gallery__stage:hover .gallery__nav {
+  opacity: 1;
+}
+
+.gallery__nav:hover {
+  background: #fff;
+  color: var(--orange-strong);
+}
+
+.gallery__nav svg {
+  width: 22px;
+  height: 22px;
+}
+
+.gallery__nav--prev {
+  left: 14px;
+}
+
+.gallery__nav--next {
+  right: 14px;
+}
+
+.gallery__dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.dot--active {
+  width: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--orange);
 }
 
 .gallery__thumbs {
@@ -181,12 +312,24 @@ const badges = [
 .thumb {
   aspect-ratio: 1 / 1;
   border-radius: var(--radius-sm);
-  color: #d8b89a;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: border-color 0.18s ease, transform 0.18s ease;
 }
 
-.thumb svg {
-  width: 26px;
-  height: 26px;
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumb:hover {
+  transform: translateY(-2px);
+}
+
+.thumb--active {
+  border-color: var(--orange);
 }
 
 .info__chip {
@@ -355,6 +498,19 @@ const badges = [
 
 .card__media {
   aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card__media img {
+  transform: scale(1.04);
 }
 
 .card__body {
@@ -420,11 +576,32 @@ const badges = [
 }
 
 @media (max-width: 560px) {
+  /* Similar products become a horizontal swipe slider. */
   .cards {
-    grid-template-columns: 1fr;
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -24px;
+    padding: 4px 24px 18px;
+  }
+  .cards::-webkit-scrollbar {
+    display: none;
+  }
+  .card {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
   }
   .price__actions .btn {
     flex: 1;
+  }
+  /* Touch devices have no hover — keep the slider arrows visible. */
+  .gallery__nav {
+    opacity: 1;
+    width: 38px;
+    height: 38px;
   }
 }
 </style>

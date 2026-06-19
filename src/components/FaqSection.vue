@@ -1,36 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
 
-const faqs = [
-  {
-    q: 'Caravan Chicken mahsulotlari nima bilan farq qiladi?',
-    a: "Biz butun jarayonni — yetishtirishdan qadoqlashgacha — o'zimiz nazorat qilamiz. Bu barqaror sifat va to'liq halollik kafolatini beradi.",
-  },
-  {
-    q: "Nega restoranlar Caravan Chicken'ni tanlaydi?",
-    a: "Uzluksiz ta'minot, barqaror sifat va yirik hajmdagi buyurtmalarni o'z vaqtida yetkazib berish — restoranlar uchun eng muhim omillar.",
-  },
-  {
-    q: "Mahsulotlar qanday sifat nazoratidan o'tadi?",
-    a: "Har bir partiya gigiyenik sexda zamonaviy uskunalar yordamida tekshiriladi va xalqaro standartlarga muvofiq qayta ishlanadi.",
-  },
-  {
-    q: 'Doimiy hamkorlar uchun alohida shartlar bormi?',
-    a: "Ha, doimiy hamkorlar uchun individual narxlar, ustuvor yetkazib berish va moslashuvchan to'lov shartlari belgilanadi.",
-  },
-  {
-    q: 'Minimal buyurtma miqdori qancha?',
-    a: "Minimal buyurtma hajmi mahsulot turiga bog'liq. Aniq miqdor uchun biz bilan bog'laning — sizga mos shartlarni taklif qilamiz.",
-  },
-  {
-    q: 'Yarim tayyor mahsulotlar qanday saqlanadi?',
-    a: "Yarim tayyor mahsulotlar muzlatilgan holatda yetkazib beriladi va tegishli harorat rejimida uzoq muddat sifatini saqlaydi.",
-  },
-  {
-    q: 'Yetkazib berish qancha vaqt oladi?',
-    a: "Toshkent bo'ylab buyurtmalar odatda 24 soat ichida yetkaziladi. Doimiy hamkorlar uchun belgilangan jadval asosida ishlaymiz.",
-  },
-]
+const { t } = useI18n()
+const faqs = computed(() => t('faq.items'))
 
 const openIndex = ref(0)
 
@@ -43,14 +16,13 @@ function toggle(i) {
   <section id="faq" class="faq">
     <div class="container faq__inner">
       <header v-reveal.left class="faq__head">
-        <p class="eyebrow">Savollar</p>
-        <h2 class="section-title faq__title">Bizdan ko'p so'raladigan savollar</h2>
+        <p class="eyebrow">{{ t('faq.eyebrow') }}</p>
+        <h2 class="section-title faq__title">{{ t('faq.title') }}</h2>
         <p class="faq__lead">
-          Bu yerda sizni qiziqtirgan barcha savollarga javob topasiz. Boshqa savollaringiz
-          bo'lsa, biz bilan bog'laning.
+          {{ t('faq.lead') }}
         </p>
         <a href="#contact" class="faq__ask">
-          Savol berish
+          {{ t('faq.ask') }}
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>

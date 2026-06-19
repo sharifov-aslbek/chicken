@@ -1,6 +1,9 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import processImg from '../assets/images/photo-qadoqlash.png'
+import { useI18n } from '../i18n/index.js'
+
+const { t } = useI18n()
 
 const stepsEl = ref(null)
 const run = ref(false)
@@ -21,47 +24,19 @@ onMounted(() => {
 
 onBeforeUnmount(() => observer?.disconnect())
 
-const steps = [
-  {
-    n: 1,
-    title: 'Yetishtirish',
-    text: "Sog'lom va tabiiy sharoitda boqilgan jo'jalar.",
-    icon: 'sprout',
-  },
-  {
-    n: 2,
-    title: "Halol so'yish",
-    text: "Shariy qoidalar asosida, qo'lda so'yiladi.",
-    icon: 'hand',
-  },
-  {
-    n: 3,
-    title: 'Tozalash & qayta ishlash',
-    text: 'Zamonaviy, gigiyenik va pokiza sexda ishlov beriladi.',
-    icon: 'spark',
-  },
-  {
-    n: 4,
-    title: 'Qadoqlash',
-    text: 'Toza va xavfsiz, pokiza qadoqlash.',
-    icon: 'box',
-  },
-  {
-    n: 5,
-    title: 'Yetkazib berish',
-    text: "Tez, uzluksiz — to'g'ridan-to'g'ri qo'lingizgacha.",
-    icon: 'dots',
-  },
-]
+const icons = ['sprout', 'hand', 'spark', 'box', 'dots']
+const steps = computed(() =>
+  t('process.steps').map((s, i) => ({ ...s, n: i + 1, icon: icons[i] }))
+)
 </script>
 
 <template>
   <section id="process" class="process">
     <div class="container">
       <header v-reveal class="process__head">
-        <p class="eyebrow">Jarayon</p>
+        <p class="eyebrow">{{ t('process.eyebrow') }}</p>
         <h2 class="section-title process__title">
-          Jo'jalikdan dasturxoningizgacha — 5 bosqich
+          {{ t('process.title') }}
         </h2>
       </header>
 

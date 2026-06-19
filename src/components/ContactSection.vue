@@ -1,17 +1,16 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
+
+const { t } = useI18n()
 
 const role = ref('restaurant')
 
-const contacts = [
-  { icon: 'phone', text: '+998 71 200 21 11' },
-  { icon: 'send', text: 'Telegram: @caravan_chicken' },
-  { icon: 'instagram', text: 'Instagram: @caravan_chicken' },
-  { icon: 'clock', text: 'Ish vaqti: Du–Sh, 9:00–18:00' },
-]
+const icons = ['phone', 'send', 'instagram', 'clock']
+const contacts = computed(() => t('contact.list').map((text, i) => ({ icon: icons[i], text })))
 
 function onSubmit() {
-  // Placeholder — integratsiya keyinroq qo'shiladi
+  // Placeholder — integration added later
 }
 </script>
 
@@ -19,11 +18,10 @@ function onSubmit() {
   <section id="contact" class="contact">
     <div class="container contact__inner">
       <div class="contact__intro">
-        <p v-reveal.left class="eyebrow eyebrow--light">Bog'lanish</p>
-        <h2 v-reveal.left="80" class="section-title contact__title">Hamkorlik yoki buyurtma uchun so'rov yuboring</h2>
+        <p v-reveal.left class="eyebrow eyebrow--light">{{ t('contact.eyebrow') }}</p>
+        <h2 v-reveal.left="80" class="section-title contact__title">{{ t('contact.title') }}</h2>
         <p v-reveal.left="160" class="contact__lead">
-          Formani to'ldiring — narx, hajm va shartlar bo'yicha siz bilan tez orada bog'lanamiz.
-          Doimiy hamkorlar uchun individual narxlar belgilanadi.
+          {{ t('contact.lead') }}
         </p>
 
         <ul v-reveal.left="240" class="contact__list">
@@ -53,22 +51,22 @@ function onSubmit() {
       <form v-reveal.right="120" class="contact__form" @submit.prevent="onSubmit">
         <div class="form-row">
           <label class="field">
-            <span class="field__label">Ism</span>
-            <input type="text" placeholder="Ismingizni kiriting" />
+            <span class="field__label">{{ t('form.name') }}</span>
+            <input type="text" :placeholder="t('form.namePh')" />
           </label>
           <label class="field">
-            <span class="field__label">Telefon raqami</span>
+            <span class="field__label">{{ t('form.phone') }}</span>
             <input type="tel" placeholder="+998" />
           </label>
         </div>
 
         <label class="field">
-          <span class="field__label">Korxona / brend nomi</span>
-          <input type="text" placeholder="Restoran yoki do'koningiz nomi" />
+          <span class="field__label">{{ t('form.company') }}</span>
+          <input type="text" :placeholder="t('form.companyPh')" />
         </label>
 
         <div class="field">
-          <span class="field__label">Men:</span>
+          <span class="field__label">{{ t('form.iAm') }}</span>
           <div class="roles">
             <button
               type="button"
@@ -77,7 +75,7 @@ function onSubmit() {
               @click="role = 'restaurant'"
             >
               <span class="role__dot"></span>
-              Restoran / Kafe
+              {{ t('contact.roleRestaurant') }}
             </button>
             <button
               type="button"
@@ -86,18 +84,18 @@ function onSubmit() {
               @click="role = 'customer'"
             >
               <span class="role__dot"></span>
-              Oddiy mijoz
+              {{ t('contact.roleCustomer') }}
             </button>
           </div>
         </div>
 
         <label class="field">
-          <span class="field__label">Izoh yoki so'rovingiz</span>
-          <textarea rows="4" placeholder="Qo'shimcha ma'lumotlar..."></textarea>
+          <span class="field__label">{{ t('form.comment') }}</span>
+          <textarea rows="4" :placeholder="t('form.commentPh')"></textarea>
         </label>
 
-        <button type="submit" class="btn btn-primary contact__submit">So'rov yuborish</button>
-        <p class="contact__note">Ma'lumotlaringiz uchinchi shaxslarga berilmaydi.</p>
+        <button type="submit" class="btn btn-primary contact__submit">{{ t('form.submit') }}</button>
+        <p class="contact__note">{{ t('contact.note') }}</p>
       </form>
     </div>
   </section>

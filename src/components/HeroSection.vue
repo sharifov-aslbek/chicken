@@ -1,7 +1,10 @@
 <script setup>
 import heroImg from '../assets/images/Union.png'
+import { computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
 
-const tags = ['Halol', 'Pokiza', 'Tez']
+const { t } = useI18n()
+const tags = computed(() => t('hero.tags'))
 </script>
 
 <template>
@@ -9,27 +12,25 @@ const tags = ['Halol', 'Pokiza', 'Tez']
     <div class="container hero__grid">
       <div class="hero__content">
         <p v-reveal class="hero__eyebrow">
-          <template v-for="(t, i) in tags" :key="t">
-            <span>{{ t }}</span>
+          <template v-for="(tag, i) in tags" :key="tag">
+            <span>{{ tag }}</span>
             <span v-if="i < tags.length - 1" class="dot">·</span>
           </template>
         </p>
 
         <h1 v-reveal="80" class="hero__title">
-          Jo'jalikdan boshlab barcha jarayonlar bizning nazoratda!
+          {{ t('hero.title') }}
         </h1>
 
         <p v-reveal="160" class="hero__lead">
-          Caravan Chicken — restoran, kafe, fastfood va oila dasturxoni uchun
-          sifatli, halol va pokiza tovuq mahsulotlarini ishlab chiqaruvchi hamda
-          yirik hajmda yetkazib beruvchi kompaniya.
+          {{ t('hero.lead') }}
         </p>
 
         <div v-reveal="240" class="hero__actions">
-          <a href="#partner" class="btn btn-soft">Hamkor bo'lish</a>
-          <a href="#products" class="btn btn-white">Mahsulotlarni ko'rish</a>
+          <a href="#partner" class="btn btn-soft">{{ t('nav.partner') }}</a>
+          <a href="#products" class="btn btn-white">{{ t('hero.viewProducts') }}</a>
           <a href="#buy" class="btn btn-ghost">
-            Sotib olish
+            {{ t('hero.buy') }}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>

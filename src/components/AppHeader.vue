@@ -1,15 +1,18 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import BrandLogo from './BrandLogo.vue'
+import { useI18n } from '../i18n/index.js'
+
+const { t, locale, locales, setLocale } = useI18n()
 
 const links = [
-  { label: 'Bosh sahifa', to: '/' },
-  { label: 'Biz haqimizda', to: '/biz-haqimizda' },
-  { label: 'Mahsulotlar', to: '/mahsulotlar' },
-  { label: 'Jarayon', to: '/#process' },
-  { label: 'Savollar', to: '/#faq' },
-  { label: "Bog'lanish", to: '/boglanish' },
+  { key: 'nav.home', to: '/' },
+  { key: 'nav.about', to: '/biz-haqimizda' },
+  { key: 'nav.products', to: '/mahsulotlar' },
+  { key: 'nav.process', to: '/#process' },
+  { key: 'nav.faq', to: '/#faq' },
+  { key: 'nav.contact', to: '/boglanish' },
 ]
 
 const route = useRoute()
@@ -20,10 +23,21 @@ function isActive(to) {
 }
 
 const open = ref(false)
+const langOpen = ref(false)
+
+const currentLang = computed(() => locales.find((l) => l.code === locale.value)?.label || 'UZ')
+
+function chooseLang(code) {
+  setLocale(code)
+  langOpen.value = false
+}
+
+// Product detail page uses a flat header (no floating cream pill).
+const flat = computed(() => route.name === 'product')
 </script>
 
 <template>
-  <header class="header">
+  <header class="header" :class="{ 'header--flat': flat }">
     <div class="container">
       <div class="bar">
         <BrandLogo />
@@ -37,18 +51,49 @@ const open = ref(false)
             :class="{ 'nav__link--active': isActive(link.to) }"
             @click="open = false"
           >
-            {{ link.label }}
+            {{ t(link.key) }}
           </router-link>
+
+          <!-- Shown only inside the mobile dropdown menu -->
+          <div class="nav__extra">
+            <div class="nav__langs">
+              <button
+                v-for="l in locales"
+                :key="l.code"
+                class="nav__lang"
+                :class="{ 'nav__lang--active': l.code === locale }"
+                @click="chooseLang(l.code)"
+              >
+                {{ l.label }}
+              </button>
+            </div>
+            <router-link to="/boglanish" class="btn btn-primary nav__cta" @click="open = false">
+              {{ t('nav.partner') }}
+            </router-link>
+          </div>
         </nav>
 
         <div class="actions">
-          <button class="lang">
-            UZ
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-          <router-link to="/boglanish" class="btn btn-primary" @click="open = false">Hamkor bo'lish</router-link>
+          <div class="lang-wrap" @mouseleave="langOpen = false">
+            <button class="lang" :class="{ 'lang--open': langOpen }" @click="langOpen = !langOpen">
+              {{ currentLang }}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+            <ul v-show="langOpen" class="lang-menu">
+              <li v-for="l in locales" :key="l.code">
+                <button
+                  class="lang-menu__item"
+                  :class="{ 'lang-menu__item--active': l.code === locale }"
+                  @click="chooseLang(l.code)"
+                >
+                  {{ l.label }}
+                </button>
+              </li>
+            </ul>
+          </div>
+          <router-link to="/boglanish" class="btn btn-primary" @click="open = false">{{ t('nav.partner') }}</router-link>
           <button class="burger" :class="{ 'burger--open': open }" @click="open = !open" aria-label="Menu">
             <span></span><span></span><span></span>
           </button>
@@ -80,6 +125,14 @@ const open = ref(false)
   box-shadow: var(--shadow-sm);
 }
 
+/* Flat variant — header sits directly on the page, no floating pill. */
+.header--flat .bar {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 14px 0;
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -109,6 +162,10 @@ const open = ref(false)
   gap: 12px;
 }
 
+.lang-wrap {
+  position: relative;
+}
+
 .lang {
   display: inline-flex;
   align-items: center;
@@ -124,17 +181,67 @@ const open = ref(false)
   background: rgba(0, 0, 0, 0.03);
 }
 
+.lang svg {
+  transition: transform 0.2s ease;
+}
+
+.lang--open svg {
+  transform: rotate(180deg);
+}
+
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  list-style: none;
+  background: #fff;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  padding: 6px;
+  min-width: 84px;
+  z-index: 60;
+}
+
+.lang-menu__item {
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.lang-menu__item:hover {
+  background: var(--card-cream);
+}
+
+.lang-menu__item--active {
+  color: var(--orange);
+}
+
+/* Mobile-only menu extras (language + CTA) — hidden on desktop */
+.nav__extra {
+  display: none;
+}
+
 .burger {
   display: none;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--orange-strong);
 }
 
 .burger span {
-  width: 22px;
+  width: 20px;
   height: 2px;
-  background: var(--ink);
+  background: #fff;
   border-radius: 2px;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
@@ -185,15 +292,49 @@ const open = ref(false)
     width: 100%;
   }
 
-  .lang {
+  /* Top bar shows only the burger; language + CTA live in the menu. */
+  .lang-wrap,
+  .actions > .btn {
     display: none;
   }
-}
 
-@media (max-width: 520px) {
-  .actions .btn {
-    padding: 12px 18px;
+  .nav__extra {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .nav__langs {
+    display: flex;
+    gap: 8px;
+    padding: 0 4px;
+  }
+
+  .nav__lang {
+    flex: 1;
     font-size: 14px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 10px 0;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .nav__lang--active {
+    color: var(--orange);
+    border-color: var(--orange);
+  }
+
+  .nav__cta {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>

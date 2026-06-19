@@ -1,29 +1,17 @@
 <script setup>
-const reviews = [
-  {
-    text: "Caravan Chicken bilan ishlay boshlaganimizdan beri ta'minot uzilishini umuman ko'rmadik. Sifat barqaror.",
-    name: 'Akmal Karimov',
-    company: '"Osh Markazi" restorani',
-  },
-  {
-    text: 'Halollik kafolati biz uchun eng muhim. Mijozlarimizga ishonch bilan taklif qilamiz.',
-    name: 'Dilnoza Yusupova',
-    company: '"Family Cafe"',
-  },
-  {
-    text: 'Yarim tayyor mahsulotlar menyumizni tezlashtirdi — buyurtma 6 daqiqada tayyor.',
-    name: 'Sardor Aliyev',
-    company: '"Tez Lunch" fastfood',
-  },
-]
+import { computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
+
+const { t } = useI18n()
+const reviews = computed(() => t('reviews.items'))
 </script>
 
 <template>
   <section class="reviews">
     <div class="container">
       <header v-reveal class="reviews__head">
-        <p class="eyebrow">Mijozlar fikri</p>
-        <h2 class="section-title reviews__title">Bizga ishongan brendlar nima deydi?</h2>
+        <p class="eyebrow">{{ t('reviews.eyebrow') }}</p>
+        <h2 class="section-title reviews__title">{{ t('reviews.title') }}</h2>
       </header>
 
       <div class="reviews__grid">

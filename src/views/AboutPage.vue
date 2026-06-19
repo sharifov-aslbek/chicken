@@ -1,28 +1,17 @@
 <script setup>
-const stats = [
-  { value: '120+', label: "Doimiy hamkor", icon: 'users' },
-  { value: '7+', label: 'Yillik tajriba', icon: 'calendar' },
-  { value: '30+', label: 'Mahsulot turi', icon: 'grid' },
-  { value: '12', label: 'Hududda yetkazish', icon: 'pin' },
-]
+import { computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
 
-const values = [
-  {
-    title: "Halal so'yish kafolati",
-    text: "Mahsulotlarimiz shariy qoidalar asosida, qo'lda va nazorat ostida so'yiladi.",
-    icon: 'hand',
-  },
-  {
-    title: "O'z tovuq fermamiz",
-    text: "Yarim 3.5 mln bosh quvvati — boshidan oxirigacha o'zimiz nazorat qilamiz.",
-    icon: 'bird',
-  },
-  {
-    title: 'Gigiyenik qadoqlash',
-    text: "Zamonaviy uskunalarda toza, ishonchli va halol qadoqlash jarayoni.",
-    icon: 'box',
-  },
-]
+const { t } = useI18n()
+
+const statValues = ['120+', '7+', '30+', '12']
+const statIcons = ['users', 'calendar', 'grid', 'pin']
+const stats = computed(() =>
+  t('aboutP.stats').map((label, i) => ({ value: statValues[i], label, icon: statIcons[i] }))
+)
+
+const valueIcons = ['hand', 'bird', 'box']
+const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: valueIcons[i] })))
 </script>
 
 <template>
@@ -30,11 +19,10 @@ const values = [
     <!-- Hero -->
     <div class="hero">
       <div class="container hero__inner">
-        <p v-reveal class="eyebrow">Biz haqimizda</p>
-        <h1 v-reveal="80" class="hero__title">Bir maqsad yo'lida birlashgan katta oila</h1>
+        <p v-reveal class="eyebrow">{{ t('aboutP.eyebrow') }}</p>
+        <h1 v-reveal="80" class="hero__title">{{ t('aboutP.title') }}</h1>
         <p v-reveal="160" class="hero__lead">
-          Caravan Chicken — jo'jalikdan dasturxoningizgacha bo'lgan barcha jarayonni o'z
-          nazorati ostida olib boradigan ishlab chiqarish kompaniyasi.
+          {{ t('aboutP.lead') }}
         </p>
       </div>
     </div>
@@ -47,23 +35,16 @@ const values = [
           <circle cx="16.5" cy="10" r="2.2" stroke="currentColor" stroke-width="1.5" />
           <path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5M14.5 19c0-2 1-3.6 2.4-4.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
         </svg>
-        <span class="banner__label">Jamoa surati uchun erkin maydon</span>
+        <span class="banner__label">{{ t('aboutP.bannerLabel') }}</span>
       </div>
     </div>
 
     <!-- Story -->
     <div class="container story">
       <div v-reveal.left class="story__text">
-        <h2 class="story__title">Bizning hikoyamiz</h2>
-        <p>
-          Caravan Chicken — jo'jalikdan boshlangan kichik bir tashabbus edi. Bugun u
-          zamonaviy uskunalar, tajribali mutaxassislar va o'z fermasi bilan O'zbekistondagi
-          yetakchi tovuq mahsulotlari ishlab chiqaruvchilaridan biriga aylandi.
-        </p>
-        <p>
-          Maqsadimiz oddiy: har bir oilaning dasturxoniga halol, toza va ishonchli mahsulot
-          yetkazish. Ana shu ishonch bizni har kuni oldinga yetaklaydi.
-        </p>
+        <h2 class="story__title">{{ t('aboutP.storyTitle') }}</h2>
+        <p>{{ t('aboutP.storyP1') }}</p>
+        <p>{{ t('aboutP.storyP2') }}</p>
       </div>
       <div v-reveal.right="120" class="story__media field-ph">
         <svg class="field-ph__icon" viewBox="0 0 24 24" fill="none">
@@ -73,7 +54,7 @@ const values = [
         </svg>
         <div class="story__badge">
           <strong>3.5 mln</strong>
-          <span>Yillik yetishtirish quvvati — bir boshdan</span>
+          <span>{{ t('aboutP.badgeText') }}</span>
         </div>
       </div>
     </div>
@@ -109,8 +90,8 @@ const values = [
     <!-- Values -->
     <div class="values-wrap">
       <div class="container">
-        <p v-reveal class="eyebrow values__eyebrow">Qadriyatlarimiz</p>
-        <h2 v-reveal="80" class="values__heading">Sifat, pokizlik va insonlar ishonchi</h2>
+        <p v-reveal class="eyebrow values__eyebrow">{{ t('aboutP.valuesEyebrow') }}</p>
+        <h2 v-reveal="80" class="values__heading">{{ t('aboutP.valuesHeading') }}</h2>
         <div class="values">
           <article v-for="(v, i) in values" :key="v.title" v-swing3d="{ delay: i * 110, from: i % 2 ? 'right' : 'left' }" class="value">
             <span class="value__icon">
@@ -137,12 +118,12 @@ const values = [
     <!-- CTA -->
     <div class="cta">
       <div class="container cta__inner">
-        <h2 v-reveal class="cta__title">Caravan Chicken oilasiga qo'shiling</h2>
+        <h2 v-reveal class="cta__title">{{ t('aboutP.ctaTitle') }}</h2>
         <p v-reveal="80" class="cta__text">
-          Hamkor, ulgurji xaridor yoki yetkazib beruvchi bo'lishni xohlaysizmi? — Biz bilan bog'laning.
+          {{ t('aboutP.ctaText') }}
         </p>
         <router-link v-reveal="160" to="/boglanish" class="btn btn-white cta__btn">
-          Hamkor bo'lish
+          {{ t('aboutP.ctaBtn') }}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
             <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>

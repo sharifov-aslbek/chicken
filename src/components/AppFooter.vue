@@ -1,13 +1,16 @@
 <script setup>
 import BrandLogo from './BrandLogo.vue'
+import { useI18n } from '../i18n/index.js'
+
+const { t } = useI18n()
 
 const pages = [
-  { label: 'Bosh sahifa', to: '/' },
-  { label: 'Mahsulotlar', to: '/mahsulotlar' },
-  { label: 'Biz haqimizda', to: '/biz-haqimizda' },
-  { label: 'Jarayon', to: '/#process' },
-  { label: 'Savollar', to: '/#faq' },
-  { label: "Bog'lanish", to: '/boglanish' },
+  { key: 'nav.home', to: '/' },
+  { key: 'nav.products', to: '/mahsulotlar' },
+  { key: 'nav.about', to: '/biz-haqimizda' },
+  { key: 'nav.process', to: '/#process' },
+  { key: 'nav.faq', to: '/#faq' },
+  { key: 'nav.contact', to: '/boglanish' },
 ]
 
 const socials = ['send', 'instagram', 'facebook', 'youtube']
@@ -19,10 +22,7 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
       <div class="footer__top">
         <div v-reveal class="footer__brand">
           <BrandLogo light />
-          <p class="footer__desc">
-            Jo'jalikdan dasturxoningizgacha — halol, pokiza va tez yetkazib beriladigan tovuq
-            mahsulotlari.
-          </p>
+          <p class="footer__desc">{{ t('footer.desc') }}</p>
           <div class="footer__socials">
             <a v-for="s in socials" :key="s" href="#" class="social" :aria-label="s">
               <svg v-if="s === 'send'" viewBox="0 0 24 24" fill="none">
@@ -45,14 +45,14 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
         </div>
 
         <div v-reveal="90" class="footer__col">
-          <h3 class="footer__title">Sahifalar</h3>
+          <h3 class="footer__title">{{ t('footer.pagesTitle') }}</h3>
           <ul>
-            <li v-for="p in pages" :key="p.to"><router-link :to="p.to">{{ p.label }}</router-link></li>
+            <li v-for="p in pages" :key="p.to"><router-link :to="p.to">{{ t(p.key) }}</router-link></li>
           </ul>
         </div>
 
         <div v-reveal="180" class="footer__col">
-          <h3 class="footer__title">Kontakt</h3>
+          <h3 class="footer__title">{{ t('footer.contactTitle') }}</h3>
           <ul class="footer__contacts">
             <li>
               <span class="footer__ico">
@@ -78,7 +78,7 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
                   <circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.7" />
                 </svg>
               </span>
-              Toshkent sh., Sergeli tumani, Qumariq MFY, Alisher Navoiy ko'chasi, 11-uy
+              {{ t('footer.address') }}
             </li>
             <li>
               <span class="footer__ico">
@@ -87,13 +87,13 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
                   <path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
-              Du–Sh, 9:00–18:00
+              {{ t('footer.hours') }}
             </li>
           </ul>
         </div>
 
         <div v-reveal="270" class="footer__col">
-          <h3 class="footer__title">Bizni toping</h3>
+          <h3 class="footer__title">{{ t('footer.findTitle') }}</h3>
           <div class="footer__map" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
               <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
@@ -104,10 +104,10 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
       </div>
 
       <div class="footer__bottom">
-        <p>© 2026 Caravan Chicken. Barcha huquqlar himoyalangan. · Ishlab chiqaruvchi: «Caravan Chickens Meat» MChJ</p>
+        <p>{{ t('footer.copyright') }}</p>
         <div class="footer__legal">
-          <a href="#">Maxfiylik siyosati</a>
-          <a href="#">Foydalanish shartlari</a>
+          <a href="#">{{ t('footer.privacy') }}</a>
+          <a href="#">{{ t('footer.terms') }}</a>
         </div>
       </div>
     </div>

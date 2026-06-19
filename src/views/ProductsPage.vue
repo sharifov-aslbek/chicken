@@ -1,14 +1,19 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { categories, products } from '../data/products.js'
+import { getCategories, getProducts } from '../data/products.js'
+import { useI18n } from '../i18n/index.js'
 
-const active = ref('Barchasi')
+const { t } = useI18n()
 
-const visible = computed(() =>
-  active.value === 'Barchasi'
-    ? products
-    : products.filter((p) => p.tag === active.value)
-)
+const categories = computed(() => getCategories())
+const activeIndex = ref(0) // 0 = "Barchasi" / "Все"
+
+const visible = computed(() => {
+  const all = getProducts()
+  if (activeIndex.value === 0) return all
+  const tag = categories.value[activeIndex.value]
+  return all.filter((p) => p.tag === tag)
+})
 </script>
 
 <template>
@@ -17,17 +22,16 @@ const visible = computed(() =>
     <div class="hero">
       <div class="container">
         <nav v-reveal class="crumbs">
-          <router-link to="/">Bosh sahifa</router-link>
+          <router-link to="/">{{ t('nav.home') }}</router-link>
           <span>›</span>
-          <span class="crumbs__current">Mahsulotlar</span>
+          <span class="crumbs__current">{{ t('nav.products') }}</span>
         </nav>
-        <p v-reveal="60" class="eyebrow">Mahsulotlar katalogi</p>
+        <p v-reveal="60" class="eyebrow">{{ t('catalog.eyebrow') }}</p>
         <h1 v-reveal="120" class="hero__title">
-          Har bir menyu uchun ideal tovuq mahsulotlari
+          {{ t('catalog.title') }}
         </h1>
         <p v-reveal="200" class="hero__lead">
-          Yangi so'yilgan, yarim tayyor, marinadlangan va dudlangan — 30 dan ortiq
-          mahsulot turi ulgurji va chakana savdo uchun.
+          {{ t('catalog.lead') }}
         </p>
       </div>
     </div>
@@ -36,11 +40,11 @@ const visible = computed(() =>
     <div class="catalog container">
       <div v-reveal class="filters">
         <button
-          v-for="c in categories"
-          :key="c"
+          v-for="(c, i) in categories"
+          :key="i"
           class="filter"
-          :class="{ 'filter--active': c === active }"
-          @click="active = c"
+          :class="{ 'filter--active': i === activeIndex }"
+          @click="activeIndex = i"
         >
           {{ c }}
         </button>
@@ -63,7 +67,7 @@ const visible = computed(() =>
             <h3 class="card__title">{{ p.title }}</h3>
             <p class="card__text">{{ p.short }}</p>
             <span class="card__link">
-              Batafsil
+              {{ t('catalog.detail') }}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -76,12 +80,12 @@ const visible = computed(() =>
     <!-- CTA band -->
     <div class="cta">
       <div class="container cta__inner">
-        <h2 v-reveal class="cta__title">Ulgurji yoki shaxsiy buyurtma?<br />Biz bilan bog'laning</h2>
+        <h2 v-reveal class="cta__title" v-html="t('catalog.ctaTitle')"></h2>
         <p v-reveal="80" class="cta__text">
-          Narx, hajm va yetkazib berish shartlari bo'yicha menejerimiz siz bilan tez orada bog'lanadi.
+          {{ t('catalog.ctaText') }}
         </p>
         <router-link v-reveal="160" to="/boglanish" class="btn btn-white cta__btn">
-          Hoziroq bog'lanish
+          {{ t('catalog.ctaBtn') }}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
             <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
@@ -292,11 +296,50 @@ const visible = computed(() =>
 }
 
 @media (max-width: 560px) {
-  .cards {
-    grid-template-columns: 1fr;
-  }
   .hero {
-    padding-top: 120px;
+    padding: 110px 0 44px;
+  }
+  .hero__title {
+    font-size: clamp(26px, 7vw, 32px);
+  }
+  .hero__lead {
+    font-size: 15px;
+  }
+  .catalog {
+    padding: 36px 20px 64px;
+  }
+  .filters {
+    gap: 9px;
+    margin-bottom: 26px;
+  }
+  .filter {
+    font-size: 13px;
+    padding: 8px 15px;
+  }
+
+  /* Compact two-column grid — matches the mobile catalog mock. */
+  .cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .card__body {
+    padding: 12px 12px 16px;
+  }
+  .card__chip {
+    font-size: 11px;
+    padding: 4px 10px;
+    margin-bottom: 9px;
+  }
+  .card__title {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  /* Cards stay compact on mobile — drop the description line. */
+  .card__text {
+    display: none;
+  }
+  .card__link {
+    font-size: 13px;
   }
 }
 </style>

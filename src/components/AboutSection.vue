@@ -1,39 +1,26 @@
 <script setup>
 import aboutImg from '../assets/images/union2.png'
+import { computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
 
-const features = [
-  {
-    title: "Halol so'yish kafolati",
-    text: "Shariy qoidalar asosida, qo'lda so'yiladi.",
-    icon: 'hand',
-  },
-  {
-    title: "O'z tovuq fermamiz mavjud",
-    text: "Sog'lom ozuqa va toza sharoit kafolati.",
-    icon: 'bird',
-  },
-  {
-    title: 'Gigiyenik va halol qadoqlash',
-    text: 'Zamonaviy uskunalarda toza, ishonchli qadoqlash.',
-    icon: 'box',
-  },
-]
+const { t } = useI18n()
+
+const icons = ['hand', 'bird', 'box']
+const features = computed(() =>
+  t('about.features').map((f, i) => ({ ...f, icon: icons[i] }))
+)
 </script>
 
 <template>
   <section id="about" class="about">
     <div class="container about__grid">
       <div class="about__content">
-        <p v-reveal.left class="eyebrow">Biz haqimizda</p>
+        <p v-reveal.left class="eyebrow">{{ t('about.eyebrow') }}</p>
         <h2 v-reveal.left="80" class="section-title about__title">
-          Ishonch ustida qurilgan katta ishlab chiqarish tizimi
+          {{ t('about.title') }}
         </h2>
         <p v-reveal.left="160" class="about__lead">
-          Caravan Chicken — jo'jalikdan dasturxoningizgacha bo'lgan barcha
-          jarayonlarni to'liq nazorat qiluvchi kompaniya. Zamonaviy uskunalar,
-          120+ tajribali mutaxassis va yiliga 3,5 milliondan ortiq bosh jo'ja
-          yetishtirish quvvati bizga har bir mahsulotda barqaror sifatni
-          ta'minlash imkonini beradi.
+          {{ t('about.lead') }}
         </p>
 
         <ul class="about__list">

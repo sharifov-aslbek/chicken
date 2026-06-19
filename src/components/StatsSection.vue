@@ -1,10 +1,14 @@
 <script setup>
-const stats = [
-  { value: '120+', label: 'Bizga ishonadigan hamkorlar', icon: 'users' },
-  { value: '7+', label: 'Sifatli ishlab chiqarish tajribasi', icon: 'calendar' },
-  { value: '30+', label: 'Mahsulot turlari', icon: 'layers' },
-  { value: '12', label: "Viloyatlar bo'ylab yetkazib berish", icon: 'map' },
-]
+import { computed } from 'vue'
+import { useI18n } from '../i18n/index.js'
+
+const { t } = useI18n()
+
+const values = ['120+', '7+', '30+', '12']
+const icons = ['users', 'calendar', 'layers', 'map']
+const stats = computed(() =>
+  t('stats.items').map((label, i) => ({ value: values[i], label, icon: icons[i] }))
+)
 
 const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria']
 </script>
@@ -43,7 +47,7 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
       </div>
 
       <div v-reveal class="trusted">
-        <p class="trusted__title">Bizga ishonishadi</p>
+        <p class="trusted__title">{{ t('stats.trusted') }}</p>
         <div class="trusted__logos">
           <div v-for="p in partners" :key="p" class="trusted__logo">
             <span class="trusted__chip"></span>
