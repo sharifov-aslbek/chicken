@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import BrandLogo from './BrandLogo.vue'
 import { useI18n } from '../i18n/index.js'
@@ -24,6 +24,7 @@ function isActive(to) {
 
 const open = ref(false)
 const langOpen = ref(false)
+const langWrap = ref(null)
 
 const currentLang = computed(() => locales.find((l) => l.code === locale.value)?.label || 'UZ')
 
@@ -32,12 +33,25 @@ function chooseLang(code) {
   langOpen.value = false
 }
 
+// Close the language dropdown when clicking anywhere outside it.
+function onDocClick(e) {
+  if (langOpen.value && langWrap.value && !langWrap.value.contains(e.target)) {
+    langOpen.value = false
+  }
+}
+
+onMounted(() => document.addEventListener('click', onDocClick))
+onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
+
 // Product detail page uses a flat header (no floating cream pill).
 const flat = computed(() => route.name === 'product')
+
+// Contact & products pages use a translucent white bar.
+const lightBar = computed(() => route.name === 'contact' || route.name === 'products')
 </script>
 
 <template>
-  <header class="header" :class="{ 'header--flat': flat }">
+  <header class="header" :class="{ 'header--flat': flat, 'header--light': lightBar }">
     <div class="container">
       <div class="bar">
         <BrandLogo />
@@ -74,7 +88,7 @@ const flat = computed(() => route.name === 'product')
         </nav>
 
         <div class="actions">
-          <div class="lang-wrap" @mouseleave="langOpen = false">
+          <div ref="langWrap" class="lang-wrap">
             <button class="lang" :class="{ 'lang--open': langOpen }" @click="langOpen = !langOpen">
               {{ currentLang }}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
@@ -123,6 +137,12 @@ const flat = computed(() => route.name === 'product')
   border-radius: var(--radius-pill);
   padding: 10px 12px 10px 22px;
   box-shadow: var(--shadow-sm);
+}
+
+/* Contact page — translucent white pill. */
+.header--light .bar {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
 }
 
 /* Flat variant — header sits directly on the page, no floating pill. */
@@ -232,14 +252,14 @@ const flat = computed(() => route.name === 'product')
   align-items: center;
   justify-content: center;
   gap: 5px;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--orange-strong);
+  width: 40px;
+  height: 40px;
+  border-radius: 32px;
+  background: #f2580c;
 }
 
 .burger span {
-  width: 20px;
+  width: 18px;
   height: 2px;
   background: #fff;
   border-radius: 2px;

@@ -264,7 +264,7 @@ const visible = computed(() => {
 }
 
 .cta {
-  background: var(--orange-strong);
+  background: #f2580c;
   padding: 72px 0;
 }
 
@@ -321,6 +321,10 @@ const visible = computed(() => {
   .cards {
     grid-template-columns: 1fr 1fr;
     gap: 14px;
+  }
+  /* Taller, portrait media to match the mobile mock. */
+  .card__media {
+    aspect-ratio: 5 / 6;
   }
   .card__body {
     padding: 12px 12px 16px;

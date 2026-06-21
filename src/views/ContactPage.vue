@@ -1,13 +1,22 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from '../i18n/index.js'
+import iconPhone from '../assets/images/connectpage/Icon/Vector.png'
+import iconSend from '../assets/images/connectpage/Icon 2/send.png'
+import iconPin from '../assets/images/connectpage/Icon 3/map-pin.png'
+import iconClock from '../assets/images/connectpage/Icon 4/clock.png'
 
 const { t } = useI18n()
 
 const role = ref('b2b')
 
-const cardIcons = ['phone', 'send', 'pin', 'clock']
-const cards = computed(() => t('contactP.cards').map((c, i) => ({ ...c, icon: cardIcons[i] })))
+const cardMeta = [
+  { src: iconPhone, href: 'tel:+998712002111' },
+  { src: iconSend, href: 'https://t.me/caravan_chicken' },
+  { src: iconPin, href: '#' },
+  { src: iconClock, href: '#' },
+]
+const cards = computed(() => t('contactP.cards').map((c, i) => ({ ...c, ...cardMeta[i] })))
 
 const sent = ref(false)
 function onSubmit() {
@@ -35,24 +44,11 @@ function onSubmit() {
           v-for="(c, i) in cards"
           :key="c.label"
           v-reveal.left="i * 90"
-          :href="c.icon === 'phone' ? 'tel:+998712002111' : c.icon === 'send' ? 'https://t.me/caravan_chicken' : '#'"
+          :href="c.href"
           class="info__card"
         >
           <span class="info__icon">
-            <svg v-if="c.icon === 'phone'" viewBox="0 0 24 24" fill="none">
-              <path d="M6.5 4h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-            </svg>
-            <svg v-else-if="c.icon === 'send'" viewBox="0 0 24 24" fill="none">
-              <path d="M21 4 3 11l6 2 2 6 10-15Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-            </svg>
-            <svg v-else-if="c.icon === 'pin'" viewBox="0 0 24 24" fill="none">
-              <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-              <circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.7" />
-            </svg>
-            <svg v-else viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7" />
-              <path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+            <img :src="c.src" :alt="c.label" width="22" height="22" />
           </span>
           <span class="info__body">
             <span class="info__label">{{ c.label }}</span>
@@ -165,9 +161,10 @@ function onSubmit() {
   display: flex;
   align-items: center;
   gap: 16px;
-  background: var(--cream);
-  border-radius: var(--radius);
-  padding: 18px 20px;
+  background: #fff6ec;
+  border: 1px solid #f3d9bf;
+  border-radius: 18px;
+  padding: 18px 22px 18px 18px;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -178,18 +175,19 @@ function onSubmit() {
 
 .info__icon {
   flex-shrink: 0;
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: #fff;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #fff1e8;
   color: var(--orange);
   display: grid;
   place-items: center;
 }
 
-.info__icon svg {
-  width: 24px;
-  height: 24px;
+.info__icon img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
 
 .info__body {
@@ -203,7 +201,7 @@ function onSubmit() {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #8a817a;
 }
 
 .info__value {
@@ -215,7 +213,7 @@ function onSubmit() {
 
 .form {
   background: #fff;
-  border: 1px solid var(--line);
+  border: 1px solid #f3d9bf;
   border-radius: var(--radius-lg);
   padding: 32px;
   box-shadow: var(--shadow);
@@ -350,23 +348,27 @@ function onSubmit() {
 }
 
 .map {
-  aspect-ratio: 16 / 7;
-  border-radius: var(--radius-lg);
-  flex-direction: column;
-  gap: 12px;
+  height: 400px;
+  border: 1px solid #f3d9bf;
+  border-radius: 24px;
 }
 
 .map__label {
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 600;
-  color: #c79e7e;
+  line-height: 18px;
+  color: #8a817a;
 }
 
 .field-ph {
-  background: linear-gradient(135deg, var(--cream-300), var(--cream-400));
-  display: grid;
-  place-items: center;
-  color: #d8b89a;
+  background: #fbe9d6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--orange);
 }
 
 .field-ph__icon {
@@ -385,16 +387,35 @@ function onSubmit() {
   .grid {
     grid-template-columns: 1fr;
     gap: 32px;
+    padding-top: 48px;
   }
 }
 
 @media (max-width: 520px) {
+  .hero {
+    padding: 120px 0 44px;
+  }
+
+  .hero__lead {
+    font-size: 15.5px;
+  }
+
   .form-row,
   .roles {
     grid-template-columns: 1fr;
   }
+
   .form {
     padding: 24px;
+  }
+
+  .map-wrap {
+    padding-top: 44px;
+    padding-bottom: 64px;
+  }
+
+  .map {
+    height: 300px;
   }
 }
 </style>

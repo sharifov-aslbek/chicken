@@ -1,16 +1,28 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from '../i18n/index.js'
+import iconUsers from '../assets/images/icons/icon.svg'
+import iconCalendar from '../assets/images/icons/icon-2.svg'
+import iconLayers from '../assets/images/icons/icon-3.svg'
+import iconMap from '../assets/images/icons/icon-4.svg'
 
 const { t } = useI18n()
 
 const values = ['120+', '7+', '30+', '12']
-const icons = ['users', 'calendar', 'layers', 'map']
+const icons = [iconUsers, iconCalendar, iconLayers, iconMap]
 const stats = computed(() =>
   t('stats.items').map((label, i) => ({ value: values[i], label, icon: icons[i] }))
 )
 
-const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria']
+// Partner logos — all images in the bizgaishonishadi folder, sorted by filename.
+const partnerLogos = Object.entries(
+  import.meta.glob('../assets/images/bizgaishonishadi/*.png', { eager: true, import: 'default' })
+)
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([, src]) => src)
+
+// Duplicated once so the marquee can loop seamlessly.
+const marquee = [...partnerLogos, ...partnerLogos]
 </script>
 
 <template>
@@ -18,29 +30,7 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
     <div class="container">
       <div class="stats__card">
         <div v-for="(s, i) in stats" :key="i" v-reveal="i * 90" class="stat" :class="{ 'stat--border': i > 0 }">
-          <span class="stat__icon">
-            <!-- users -->
-            <svg v-if="s.icon === 'users'" viewBox="0 0 24 24" fill="none">
-              <circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.8" />
-              <path d="M3.5 19a5.5 5.5 0 0 1 11 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-              <path d="M16 6.2a3 3 0 0 1 0 5.6M18 19a5.2 5.2 0 0 0-2.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg>
-            <!-- calendar -->
-            <svg v-else-if="s.icon === 'calendar'" viewBox="0 0 24 24" fill="none">
-              <rect x="3.5" y="5" width="17" height="15" rx="3" stroke="currentColor" stroke-width="1.8" />
-              <path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg>
-            <!-- layers -->
-            <svg v-else-if="s.icon === 'layers'" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3l9 5-9 5-9-5 9-5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-              <path d="M3 13l9 5 9-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-            </svg>
-            <!-- map -->
-            <svg v-else viewBox="0 0 24 24" fill="none">
-              <path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-              <path d="M9 4v14M15 6v14" stroke="currentColor" stroke-width="1.8" />
-            </svg>
-          </span>
+          <img class="stat__icon" :src="s.icon" :alt="s.label" width="36" height="36" />
           <div class="stat__value">{{ s.value }}</div>
           <div class="stat__label">{{ s.label }}</div>
         </div>
@@ -48,10 +38,11 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
 
       <div v-reveal class="trusted">
         <p class="trusted__title">{{ t('stats.trusted') }}</p>
-        <div class="trusted__logos">
-          <div v-for="p in partners" :key="p" class="trusted__logo">
-            <span class="trusted__chip"></span>
-            {{ p }}
+        <div class="marquee">
+          <div class="marquee__track">
+            <div v-for="(logo, i) in marquee" :key="i" class="marquee__item">
+              <img :src="logo" alt="Hamkor logotipi" loading="lazy" />
+            </div>
           </div>
         </div>
       </div>
@@ -76,6 +67,15 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
 
 .stat {
   padding: 8px 36px;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stat:hover {
+  transform: translateY(-8px);
+}
+
+.stat:hover .stat__icon {
+  transform: translateY(-2px) scale(1.06);
 }
 
 .stat--border {
@@ -83,14 +83,11 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
 }
 
 .stat__icon {
-  display: inline-flex;
-  color: var(--orange);
+  display: block;
+  width: 36px;
+  height: 36px;
   margin-bottom: 14px;
-}
-
-.stat__icon svg {
-  width: 26px;
-  height: 26px;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .stat__value {
@@ -103,7 +100,8 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
 }
 
 .stat__label {
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 22px;
   font-family: var(--font-body);
   font-weight: 400;
   color: #4a423c;
@@ -116,37 +114,65 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
 }
 
 .trusted__title {
+  font-family: var(--font-body);
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: #8a817a;
   margin-bottom: 32px;
 }
 
-.trusted__logos {
+.marquee {
+  position: relative;
+  overflow: hidden;
+  /* Fade the logos out at both edges. */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee__track {
   display: flex;
-  flex-wrap: wrap;
+  width: max-content;
+  align-items: center;
+  gap: 56px;
+  animation: marquee-scroll 32s linear infinite;
+}
+
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+
+.marquee__item {
+  flex: 0 0 auto;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px 48px;
 }
 
-.trusted__logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--muted-2);
-  opacity: 0.85;
+.marquee__item img {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 14px;
 }
 
-.trusted__chip {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: #d9d2ca;
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* Shift by exactly half — the second copy lines up seamlessly. */
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track {
+    animation: none;
+  }
 }
 
 @media (max-width: 900px) {
@@ -166,16 +192,49 @@ const partners = ['Evos', 'Oqtepa', 'MaxWay', 'Les Ailes', 'FeedUp', 'Caféteria
 }
 
 @media (max-width: 520px) {
+  .stats {
+    padding: 56px 0 64px;
+  }
+
   .stats__card {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 0;
+    padding: 28px 8px;
   }
 
   .stat--border {
     border-left: none;
   }
 
-  .trusted__logo {
-    font-size: 18px;
+  .stat {
+    padding: 4px 20px;
+  }
+
+  .stat__value {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  .stat__label {
+    font-size: 14px;
+    line-height: 22px;
+    max-width: 140px;
+  }
+
+  .trusted {
+    margin-top: 48px;
+  }
+
+  .trusted__title {
+    margin-bottom: 28px;
+  }
+
+  .marquee__track {
+    gap: 36px;
+  }
+
+  .marquee__item img {
+    height: 40px;
   }
 }
 </style>

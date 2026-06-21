@@ -1,9 +1,92 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '../i18n/index.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const reviews = computed(() => t('reviews.items'))
+
+// Typewriter state, one entry per review card.
+const typed = ref([])
+const finished = ref([])
+const cardEls = []
+let observer = null
+const timers = []
+const reduceMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+function clearTimers() {
+  timers.forEach((id) => clearTimeout(id))
+  timers.length = 0
+}
+
+function fullText(i) {
+  return `"${reviews.value[i].text}"`
+}
+
+function reset() {
+  typed.value = reviews.value.map(() => '')
+  finished.value = reviews.value.map(() => false)
+}
+
+function typeCard(i) {
+  const full = fullText(i)
+  let n = 0
+  const step = () => {
+    typed.value[i] = full.slice(0, n)
+    if (n < full.length) {
+      n += 1
+      timers.push(setTimeout(step, 22))
+    } else {
+      finished.value[i] = true
+    }
+  }
+  step()
+}
+
+function showInstantly() {
+  reviews.value.forEach((_, i) => {
+    typed.value[i] = fullText(i)
+    finished.value[i] = true
+  })
+}
+
+onMounted(() => {
+  reset()
+  if (reduceMotion) {
+    showInstantly()
+    return
+  }
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return
+        const i = Number(e.target.dataset.idx)
+        observer.unobserve(e.target)
+        timers.push(setTimeout(() => typeCard(i), i * 280))
+      })
+    },
+    { threshold: 0.45 }
+  )
+  cardEls.forEach((el) => el && observer.observe(el))
+})
+
+// Re-type from scratch when the language changes.
+watch(locale, () => {
+  clearTimers()
+  reset()
+  if (reduceMotion) {
+    showInstantly()
+    return
+  }
+  reviews.value.forEach((_, i) => timers.push(setTimeout(() => typeCard(i), i * 280)))
+})
+
+onBeforeUnmount(() => {
+  observer && observer.disconnect()
+  clearTimers()
+})
 </script>
 
 <template>
@@ -18,6 +101,8 @@ const reviews = computed(() => t('reviews.items'))
         <article
           v-for="(r, i) in reviews"
           :key="r.name"
+          :ref="(el) => { if (el) cardEls[i] = el.$el || el }"
+          :data-idx="i"
           v-scroll3d="{ tilt: 6 }"
           v-reveal3d.cascade="i * 110"
           class="review"
@@ -30,7 +115,10 @@ const reviews = computed(() => t('reviews.items'))
             </div>
             <span class="review__logo">LOGO</span>
           </div>
-          <p class="review__text">"{{ r.text }}"</p>
+          <p class="review__text">
+            <span class="review__sizer" aria-hidden="true">"{{ r.text }}"</span>
+            <span class="review__typed">{{ typed[i] }}<i v-if="!finished[i]" class="review__caret" aria-hidden="true"></i></span>
+          </p>
           <div class="review__author">
             <span class="review__avatar" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none">
@@ -152,12 +240,39 @@ const reviews = computed(() => t('reviews.items'))
 }
 
 .review__text {
+  position: relative;
   font-size: 19px;
   font-weight: 600;
   line-height: 1.4;
   color: var(--ink);
   margin-bottom: 28px;
   flex: 1;
+}
+
+/* Invisible full text reserves the final height so typing doesn't shift layout. */
+.review__sizer {
+  visibility: hidden;
+}
+
+.review__typed {
+  position: absolute;
+  inset: 0;
+}
+
+.review__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--orange);
+  animation: review-caret 0.8s steps(1) infinite;
+}
+
+@keyframes review-caret {
+  50% {
+    opacity: 0;
+  }
 }
 
 .review__author {

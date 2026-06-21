@@ -1,6 +1,10 @@
 <script setup>
 import BrandLogo from './BrandLogo.vue'
 import { useI18n } from '../i18n/index.js'
+import socTelegram from '../assets/images/footer-social-media-icons/Icon 5/send.png'
+import socInstagram from '../assets/images/footer-social-media-icons/Icon 6/instagram.png'
+import socFacebook from '../assets/images/footer-social-media-icons/Icon 7/facebook.png'
+import socYoutube from '../assets/images/footer-social-media-icons/Icon 8/youtube.png'
 
 const { t } = useI18n()
 
@@ -13,7 +17,12 @@ const pages = [
   { key: 'nav.contact', to: '/boglanish' },
 ]
 
-const socials = ['send', 'instagram', 'facebook', 'youtube']
+const socials = [
+  { src: socTelegram, label: 'Telegram', href: 'https://t.me/caravan_chicken' },
+  { src: socInstagram, label: 'Instagram', href: '#' },
+  { src: socFacebook, label: 'Facebook', href: '#' },
+  { src: socYoutube, label: 'YouTube', href: '#' },
+]
 </script>
 
 <template>
@@ -24,22 +33,8 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
           <BrandLogo light />
           <p class="footer__desc">{{ t('footer.desc') }}</p>
           <div class="footer__socials">
-            <a v-for="s in socials" :key="s" href="#" class="social" :aria-label="s">
-              <svg v-if="s === 'send'" viewBox="0 0 24 24" fill="none">
-                <path d="M21 4 3 11l6 2 2 6 10-15Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-              </svg>
-              <svg v-else-if="s === 'instagram'" viewBox="0 0 24 24" fill="none">
-                <rect x="4" y="4" width="16" height="16" rx="5" stroke="currentColor" stroke-width="1.7" />
-                <circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="1.7" />
-                <circle cx="17" cy="7" r="1" fill="currentColor" />
-              </svg>
-              <svg v-else-if="s === 'facebook'" viewBox="0 0 24 24" fill="none">
-                <path d="M14 8h2V5h-2.2C12 5 11 6.3 11 8v1.5H9V12h2v7h2.5v-7H16l.5-2.5H13.5V8.4c0-.3.2-.4.5-.4Z" fill="currentColor" />
-              </svg>
-              <svg v-else viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="6" width="18" height="12" rx="3.5" stroke="currentColor" stroke-width="1.7" />
-                <path d="m10.5 9.5 4 2.5-4 2.5v-5Z" fill="currentColor" />
-              </svg>
+            <a v-for="s in socials" :key="s.label" :href="s.href" class="social" :aria-label="s.label">
+              <img :src="s.src" :alt="s.label" width="19" height="19" />
             </a>
           </div>
         </div>
@@ -111,12 +106,19 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
         </div>
       </div>
     </div>
+
+    <a href="tel:+998712002111" class="call-fab" aria-label="Qo'ng'iroq qilish">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M6.5 4h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z" fill="currentColor" />
+      </svg>
+    </a>
   </footer>
 </template>
 
 <style scoped>
 .footer {
-  background: #2b1410;
+  position: relative;
+  background: #3e0a0a;
   color: rgba(255, 255, 255, 0.78);
   padding: 64px 0 28px;
 }
@@ -156,9 +158,10 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
   background: var(--orange);
 }
 
-.social svg {
+.social img {
   width: 19px;
   height: 19px;
+  object-fit: contain;
 }
 
 .footer__title {
@@ -249,10 +252,92 @@ const socials = ['send', 'instagram', 'facebook', 'youtube']
   color: #fff;
 }
 
+/* Floating call button — fixed bottom-right with a pulsing ring. */
+.call-fab {
+  position: absolute;
+  right: 26px;
+  bottom: 26px;
+  z-index: 5;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #41c56b;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  animation: fab-bob 2.4s ease-in-out infinite;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.call-fab svg {
+  width: 28px;
+  height: 28px;
+}
+
+.call-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.34);
+}
+
+/* Two expanding rings behind the button. */
+.call-fab::before,
+.call-fab::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #41c56b;
+  z-index: -1;
+  animation: fab-pulse 2.2s ease-out infinite;
+}
+
+.call-fab::after {
+  animation-delay: 1.1s;
+}
+
+@keyframes fab-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes fab-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .call-fab,
+  .call-fab::before,
+  .call-fab::after {
+    animation: none;
+  }
+}
+
 @media (max-width: 920px) {
   .footer__top {
     grid-template-columns: 1fr 1fr;
     gap: 36px;
+  }
+}
+
+@media (max-width: 560px) {
+  .call-fab {
+    right: 18px;
+    bottom: 18px;
+    width: 54px;
+    height: 54px;
   }
 }
 

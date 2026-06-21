@@ -1,5 +1,5 @@
 <script setup>
-import heroImg from '../assets/images/Union.png'
+import heroImgMobile from '../assets/images/hero-mobile.png'
 import { computed } from 'vue'
 import { useI18n } from '../i18n/index.js'
 
@@ -38,8 +38,8 @@ const tags = computed(() => t('hero.tags'))
         </div>
       </div>
 
-      <div class="hero__media">
-        <img v-parallax="{ distance: 14, scale: 1.06 }" class="hero__img" :src="heroImg" alt="Caravan Chicken ishchisi va jo'ja" />
+      <div class="hero__media" role="img" aria-label="Caravan Chicken ishchisi va jo'ja">
+        <img class="hero__img--mobile" :src="heroImgMobile" alt="Caravan Chicken ishchisi va jo'ja" />
       </div>
     </div>
   </section>
@@ -63,7 +63,7 @@ const tags = computed(() => t('hero.tags'))
   gap: 32px;
   height: 100%;
   padding-top: 110px;
-  padding-bottom: 40px;
+  padding-bottom: 0;
 }
 
 .hero__content {
@@ -92,9 +92,7 @@ const tags = computed(() => t('hero.tags'))
   font-weight: 800;
   line-height: 1.02;
   letter-spacing: -0.02em;
-  width: 608px;
-  max-width: 100%;
-  height: 174px;
+  max-width: 608px;
   margin-bottom: 24px;
 }
 
@@ -113,23 +111,24 @@ const tags = computed(() => t('hero.tags'))
   gap: 14px;
 }
 
+/* Decorative photo lives as a right-anchored background that fills the hero
+   height. The PNG has ~38% transparent padding at the bottom, so the
+   background is oversized (auto 165%) and pinned to the top — the empty
+   bottom falls outside the box, leaving the photo flush with the hero edge. */
 .hero__media {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 50%;
+  width: 55%;
+  background-image: url('../assets/images/Union.png');
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-size: auto 165%;
 }
 
-.hero__img {
-  position: absolute;
-  right: 0;
-  bottom: 20;
-  width: 1472px;
-  height: 1042px;
-  max-width: none;
-  object-fit: contain;
-  object-position: right bottom;
+.hero__img--mobile {
+  display: none;
 }
 
 @media (max-width: 980px) {
@@ -150,16 +149,85 @@ const tags = computed(() => t('hero.tags'))
     position: relative;
     width: 100%;
     height: 420px;
-  }
-
-  .hero__img {
-    object-position: center;
+    background-position: center top;
+    background-size: cover;
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
+  .hero {
+    border-radius: 0 0 28px 28px;
+  }
+
+  .hero__grid {
+    gap: 0;
+    padding-top: 96px;
+    padding-bottom: 0;
+  }
+
+  .hero__content {
+    max-width: 100%;
+    padding: 8px 0 0;
+  }
+
+  .hero__title {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 38px;
+    letter-spacing: -0.01em;
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+
+  .hero__lead {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
   .hero__actions .btn {
-    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  /* Hamkor bo'lish — white filled */
+  .hero__actions .btn-soft {
+    background: #fff;
+    color: var(--orange);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Mahsulotlarni ko'rish — outlined */
+  .hero__actions .btn-white {
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    box-shadow: none;
+  }
+
+  /* Sotib olish — centered text link */
+  .hero__actions .btn-ghost {
+    margin-top: 2px;
+  }
+
+  .hero__media {
+    height: auto;
+    margin: 28px -24px 0;
+    width: calc(100% + 48px);
+    background-image: none;
+  }
+
+  .hero__img--mobile {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: auto;
   }
 }
 </style>

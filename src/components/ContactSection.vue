@@ -103,13 +103,13 @@ function onSubmit() {
 
 <style scoped>
 .contact {
-  background: var(--orange-strong);
-  padding: 96px 0;
+  background: #f2580c;
+  padding: 100px 0;
 }
 
 .contact__inner {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 608px 1fr;
   gap: 56px;
   align-items: start;
 }
@@ -120,15 +120,20 @@ function onSubmit() {
 
 .contact__title {
   margin-top: 12px;
-  color: #fff;
-  max-width: 480px;
+  max-width: 608px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 46px;
+  line-height: 104%;
+  letter-spacing: -0.015em;
+  color: #fff6ec;
 }
 
 .contact__lead {
   margin-top: 18px;
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
-  max-width: 480px;
+  max-width: 608px;
 }
 
 .contact__list {
@@ -140,7 +145,7 @@ function onSubmit() {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  max-width: 480px;
+  max-width: 608px;
 }
 
 .contact__list li {
@@ -280,7 +285,7 @@ function onSubmit() {
   margin-top: 14px;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 1024px) {
   .contact__inner {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -290,6 +295,12 @@ function onSubmit() {
   .contact__lead,
   .contact__list {
     max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .contact__title {
+    font-size: 34px;
   }
 }
 

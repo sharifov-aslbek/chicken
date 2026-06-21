@@ -6,6 +6,7 @@ import { messages } from './messages.js'
 export const locales = [
   { code: 'uz', label: 'UZ' },
   { code: 'ru', label: 'RU' },
+  { code: 'en', label: 'EN' },
 ]
 
 const STORAGE_KEY = 'caravan-locale'

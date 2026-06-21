@@ -27,31 +27,21 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
       </div>
     </div>
 
-    <!-- Team banner -->
-    <div class="container">
-      <div v-reveal3d.pop class="banner field-ph">
-        <svg class="field-ph__icon" viewBox="0 0 24 24" fill="none">
-          <circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.5" />
-          <circle cx="16.5" cy="10" r="2.2" stroke="currentColor" stroke-width="1.5" />
-          <path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5M14.5 19c0-2 1-3.6 2.4-4.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-        </svg>
-        <span class="banner__label">{{ t('aboutP.bannerLabel') }}</span>
-      </div>
-    </div>
+    <!-- Team banner (full-bleed) -->
+    <div v-reveal3d.pop class="banner" role="img" :aria-label="t('aboutP.title')"></div>
 
     <!-- Story -->
-    <div class="container story">
-      <div v-reveal.left class="story__text">
-        <h2 class="story__title">{{ t('aboutP.storyTitle') }}</h2>
-        <p>{{ t('aboutP.storyP1') }}</p>
-        <p>{{ t('aboutP.storyP2') }}</p>
+    <div class="story">
+      <div class="container story__inner">
+        <div v-reveal.left class="story__text">
+          <h2 class="story__title">{{ t('aboutP.storyTitle') }}</h2>
+          <p>{{ t('aboutP.storyP1') }}</p>
+          <p>{{ t('aboutP.storyP2') }}</p>
+          <p>{{ t('aboutP.storyP3') }}</p>
+        </div>
       </div>
-      <div v-reveal.right="120" class="story__media field-ph">
-        <svg class="field-ph__icon" viewBox="0 0 24 24" fill="none">
-          <rect x="3.5" y="5" width="17" height="14" rx="2.5" stroke="currentColor" stroke-width="1.5" />
-          <circle cx="9" cy="10" r="1.8" stroke="currentColor" stroke-width="1.5" />
-          <path d="m5 18 5-4.5 3 2.5L17 12l3 3" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-        </svg>
+      <div v-reveal.right="120" class="story__media">
+        <div class="story__photo"></div>
         <div class="story__badge">
           <strong>3.5 mln</strong>
           <span>{{ t('aboutP.badgeText') }}</span>
@@ -162,28 +152,31 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
 }
 
 .banner {
-  margin-top: -40px;
-  aspect-ratio: 16 / 6.4;
-  border-radius: var(--radius-lg);
+  width: 100%;
+  aspect-ratio: 1440 / 1200;
+  border-radius: 20px;
   position: relative;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.banner__label {
-  position: absolute;
-  bottom: 22px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #c79e7e;
+  background: url('../assets/images/bizhaqimizda/mainimage.png') center / cover no-repeat;
 }
 
 .story {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 56px;
+  position: relative;
+  min-height: 951px;
+  background: #fff;
+}
+
+/* Text column stays inside the container; vertically centered. */
+.story__inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
   align-items: center;
-  padding: 84px 24px;
+  min-height: 951px;
+}
+
+.story__text {
+  max-width: 620px;
+  padding: 72px 0;
 }
 
 .story__title {
@@ -199,36 +192,46 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
   margin-bottom: 16px;
 }
 
+/* Image bleeds to the right viewport edge at full section height. */
 .story__media {
-  aspect-ratio: 4 / 3.2;
-  border-radius: var(--radius);
-  position: relative;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 70%;
+  z-index: 1;
+}
+
+.story__photo {
+  position: absolute;
+  inset: 0;
+  background: url('../assets/images/bizhaqimizda/bizninghikoyamiz.png') right center / cover no-repeat;
 }
 
 .story__badge {
   position: absolute;
-  left: 22px;
-  bottom: 22px;
-  background: var(--orange);
+  left: 15%;
+  bottom: 80px;
+  background: #f2580c;
   color: #fff;
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  max-width: 230px;
+  border-radius: 18px;
+  padding: 24px 28px;
+  max-width: 360px;
   box-shadow: var(--shadow);
 }
 
 .story__badge strong {
   display: block;
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 800;
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .story__badge span {
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.5;
   opacity: 0.95;
 }
 
@@ -236,6 +239,7 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
+  padding-top: 72px;
   padding-bottom: 30px;
 }
 
@@ -253,16 +257,18 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
 }
 
 .stat__icon svg {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
 }
 
 .stat__value {
   display: block;
-  font-size: 34px;
+  font-family: var(--font-display);
+  font-size: 56px;
   font-weight: 800;
-  color: var(--ink);
-  line-height: 1;
+  line-height: 56px;
+  letter-spacing: -0.015em;
+  color: #f2580c;
   margin-bottom: 6px;
 }
 
@@ -346,7 +352,7 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
 }
 
 .cta {
-  background: var(--orange-strong);
+  background: #f2580c;
   padding: 64px 0;
 }
 
@@ -372,14 +378,46 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
 
 @media (max-width: 980px) {
   .story {
-    grid-template-columns: 1fr;
-    gap: 36px;
+    min-height: 0;
+  }
+  .story__inner {
+    display: block;
+    min-height: 0;
+  }
+  .story__text {
+    max-width: none;
+    padding: 56px 0 28px;
   }
   .stats {
     grid-template-columns: 1fr 1fr;
   }
   .values {
     grid-template-columns: 1fr;
+  }
+
+  /* Stacked layout: a landscape photo with the badge as a full-width block below. */
+  .story__media {
+    position: static;
+    width: 100%;
+    padding: 0 24px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .story__photo {
+    position: static;
+    aspect-ratio: 335 / 180;
+    border-radius: var(--radius);
+    background-image: url('../assets/images/bizhaqimizda/story-photo.png');
+  }
+
+  .story__badge {
+    position: static;
+    left: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: none;
   }
 }
 

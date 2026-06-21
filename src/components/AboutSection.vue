@@ -1,5 +1,5 @@
 <script setup>
-import aboutImg from '../assets/images/union2.png'
+import aboutMobileImg from '../assets/images/about-us-mobile.png'
 import { computed } from 'vue'
 import { useI18n } from '../i18n/index.js'
 
@@ -22,6 +22,10 @@ const features = computed(() =>
         <p v-reveal.left="160" class="about__lead">
           {{ t('about.lead') }}
         </p>
+
+        <div class="about__media" role="img" aria-label="Caravan Chicken ishlab chiqarish liniyasi">
+          <img class="about__photo about__photo--mobile" :src="aboutMobileImg" alt="Caravan Chicken ishlab chiqarish liniyasi" />
+        </div>
 
         <ul class="about__list">
           <li v-for="(f, i) in features" :key="f.title" v-reveal.left="220 + i * 90" class="feature">
@@ -46,11 +50,8 @@ const features = computed(() =>
           </li>
         </ul>
       </div>
-
-      <div class="about__media">
-        <img v-parallax="{ distance: 22, scale: 1.1 }" class="about__photo" :src="aboutImg" alt="Caravan Chicken ishlab chiqarish liniyasi" />
-      </div>
     </div>
+    <span class="about__fade" aria-hidden="true"></span>
   </section>
 </template>
 
@@ -58,30 +59,42 @@ const features = computed(() =>
 .about {
   position: relative;
   background: var(--cream);
-  border-radius: 40px;
   overflow: hidden;
+  min-height: 812px;
 }
 
 .about__grid {
   display: grid;
-  grid-template-columns: 1fr 1.05fr;
+  grid-template-columns: 650px 1fr;
   align-items: center;
+  align-content: center;
   gap: 56px;
+  min-height: 812px;
 }
 
 .about__content {
-  padding: 100px 0;
+  padding: 0;
 }
 
 .about__title {
   margin: 16px 0 22px;
-  max-width: 440px;
+  max-width: 650px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 46px;
+  line-height: 106%;
+  letter-spacing: -0.015em;
+  color: #3e0a0a;
 }
 
 .about__lead {
-  color: var(--muted);
-  font-size: 16.5px;
-  line-height: 1.7;
+  max-width: 650px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 29px;
+  letter-spacing: 0;
+  color: #4a423c;
   margin-bottom: 36px;
 }
 
@@ -109,15 +122,20 @@ const features = computed(() =>
 }
 
 .feature__title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 26px;
+  color: #1f1a17;
   margin-bottom: 4px;
 }
 
 .feature__text {
-  color: var(--muted);
-  font-size: 15px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 26px;
+  color: #4a423c;
 }
 
 .about__media {
@@ -125,31 +143,73 @@ const features = computed(() =>
   top: 0;
   bottom: 0;
   right: 0;
-  width: 50%;
+  /* Image is 1040×812 — at 812px section height it sits at its natural size,
+     occupying ~72% of a 1440 frame on the right (matching Figma). */
+  width: 72%;
+  background-image: url('../assets/images/union2.png');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: cover;
 }
 
-.about__photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: right center;
-  display: block;
+.about__photo--mobile {
+  display: none;
+}
+
+.about__fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(to top, #fff6ec 0%, rgba(255, 246, 236, 0) 100%);
 }
 
 @media (max-width: 980px) {
+  .about,
+  .about__grid {
+    min-height: 0;
+  }
+
   .about__grid {
     grid-template-columns: 1fr;
     gap: 0;
   }
 
   .about__content {
-    padding: 64px 0 40px;
+    padding: 56px 0 40px;
+  }
+
+  .eyebrow {
+    text-align: center;
+  }
+
+  .about__title {
+    font-size: 34px;
   }
 
   .about__media {
     position: relative;
+    top: auto;
+    bottom: auto;
+    right: auto;
     width: 100%;
-    height: 320px;
+    height: auto;
+    margin: 12px 0 32px;
+    background-image: none;
+  }
+
+  .about__photo--mobile {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 18px;
+  }
+
+  .about__fade {
+    display: none;
   }
 }
 </style>

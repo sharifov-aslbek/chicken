@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from '../i18n/index.js'
 import { getCategories } from '../data/products.js'
+import videoImg from '../assets/images/VideoPlayer.png'
 
 const { t } = useI18n()
 
@@ -23,12 +24,11 @@ const visible = computed(() =>
 
 <template>
   <section id="products" class="products">
-    <div class="container">
-      <div v-reveal3d.pop class="products__video img-ph" :data-label="t('prod.eyebrow')">
-        <span class="video-badge">{{ t('prod.videoBadge') }}</span>
-        <span class="video-progress"></span>
-      </div>
+    <div v-reveal3d.pop class="products__video" :style="{ backgroundImage: `url(${videoImg})` }">
+      <span class="video-progress"></span>
+    </div>
 
+    <div class="container">
       <div class="products__head">
         <div v-reveal.left>
           <p class="eyebrow">{{ t('prod.eyebrow') }}</p>
@@ -92,21 +92,13 @@ const visible = computed(() =>
 .products__video {
   width: 100%;
   aspect-ratio: 16 / 8.2;
-  border-radius: var(--radius);
   margin-bottom: 56px;
   position: relative;
-}
-
-.video-badge {
-  position: absolute;
-  left: 16px;
-  bottom: 24px;
-  background: rgba(20, 16, 12, 0.78);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .video-progress {
@@ -271,8 +263,28 @@ const visible = computed(() =>
 }
 
 @media (max-width: 560px) {
+  /* Horizontal scroll-snap slider; the next card peeks at the edge. */
   .cards {
-    grid-template-columns: 1fr;
+    display: flex;
+    grid-template-columns: none;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding: 0 24px;
+    /* Bleed to the viewport edges, then pad back so the first card aligns. */
+    margin: 0 -24px;
+    padding: 4px 24px 8px;
+    scrollbar-width: none;
+  }
+
+  .cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
   }
 }
 </style>
