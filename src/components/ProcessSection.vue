@@ -245,10 +245,33 @@ const steps = computed(() =>
 @media (max-width: 520px) {
   .steps {
     grid-template-columns: 1fr;
+    gap: 28px;
+    margin-bottom: 40px;
+  }
+
+  /* row layout: numbered circle on the left, icon+title + text on the right */
+  .step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 16px;
+    align-items: start;
+  }
+
+  .step__top {
+    grid-row: 1 / span 2;
+    margin-bottom: 0;
+  }
+
+  .step__title {
+    margin-top: 0;
+  }
+
+  .step__text {
+    max-width: none;
   }
 
   .process__photo {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 4;
   }
 }
 </style>
