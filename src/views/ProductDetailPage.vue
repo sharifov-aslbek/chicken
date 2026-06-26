@@ -1,30 +1,62 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { getProduct, relatedProducts } from '../data/products.js'
+import { storeToRefs } from 'pinia'
 import productImg from '../assets/images/StaticProduct.png'
 import { useI18n } from '../i18n/index.js'
+import { useOverallStore } from '../store/overall.js'
 
-const { t } = useI18n()
-
+const { t, locale } = useI18n()
 const route = useRoute()
-const product = computed(() => getProduct(route.params.slug))
-const related = computed(() => relatedProducts(route.params.slug))
+const store = useOverallStore()
+const { product, home } = storeToRefs(store)
 
-// Static gallery — same image repeated so the slider motion is visible.
-const slides = [productImg, productImg, productImg, productImg]
+// API text fields are { uz, ru, en } objects — pick the active locale, fall back to UZ.
+function tr(field) {
+  if (!field) return ''
+  if (typeof field === 'string') return field
+  return field[locale.value] || field.uz || ''
+}
+
+// Gallery images come from the API; fall back to the static placeholder.
+const slides = computed(() => {
+  const imgs = (product.value?.images || []).filter(Boolean)
+  return imgs.length ? imgs : [productImg]
+})
+
+// Characteristics map straight onto the spec list.
+const specs = computed(() =>
+  (product.value?.characteristics || []).map((c) => ({
+    label: tr(c.name),
+    value: tr(c.value),
+  }))
+)
+
+// Related = other products from the home feed, same category first.
+const related = computed(() => {
+  const all = (home.value || []).flatMap((c) => c.products || [])
+  return all
+    .filter((p) => p.id !== product.value?.id)
+    .sort((a, b) => Number(b.category_id === product.value?.category_id) - Number(a.category_id === product.value?.category_id))
+    .slice(0, 4)
+})
+
 const active = ref(0)
-
 const go = (i) => {
-  active.value = (i + slides.length) % slides.length
+  active.value = (i + slides.value.length) % slides.value.length
 }
 const next = () => go(active.value + 1)
 const prev = () => go(active.value - 1)
 
-// Reset the slider when navigating between products.
-watch(() => route.params.slug, () => {
+function load() {
   active.value = 0
-})
+  store.getProduct(route.params.slug)
+  if (!home.value) store.getHome()
+}
+
+onMounted(load)
+// Refetch when navigating between products.
+watch(() => route.params.slug, load)
 
 const badges = computed(() => [
   { icon: 'shield', text: t('detail.badgeHalal') },
@@ -41,7 +73,7 @@ const badges = computed(() => [
         <span>›</span>
         <router-link to="/mahsulotlar">{{ t('nav.products') }}</router-link>
         <span>›</span>
-        <span class="crumbs__current">{{ product.title }}</span>
+        <span class="crumbs__current">{{ tr(product?.title) }}</span>
       </nav>
 
       <!-- Top: gallery + info -->
@@ -50,7 +82,7 @@ const badges = computed(() => [
           <div v-reveal3d.pop class="gallery__stage">
             <div class="gallery__track" :style="{ transform: `translateX(-${active * 100}%)` }">
               <div v-for="(img, i) in slides" :key="i" class="gallery__slide">
-                <img :src="img" :alt="product.fullTitle" />
+                <img :src="img" :alt="tr(product?.title)" />
               </div>
             </div>
 
@@ -94,12 +126,12 @@ const badges = computed(() => [
         </div>
 
         <div class="info">
-          <span v-reveal.right class="info__chip">{{ product.tag }}</span>
-          <h1 v-reveal.right="60" class="info__title">{{ product.fullTitle }}</h1>
-          <p v-reveal.right="120" class="info__desc">{{ product.desc }}</p>
+          <span v-reveal.right class="info__chip">{{ tr(product?.category_name) }}</span>
+          <h1 v-reveal.right="60" class="info__title">{{ tr(product?.title) }}</h1>
+          <p v-reveal.right="120" class="info__desc">{{ tr(product?.short_description) }}</p>
 
-          <ul v-reveal.right="180" class="specs">
-            <li v-for="s in product.specs" :key="s.label">
+          <ul v-if="specs.length" v-reveal.right="180" class="specs">
+            <li v-for="s in specs" :key="s.label">
               <span class="specs__label">{{ s.label }}</span>
               <span class="specs__value">{{ s.value }}</span>
             </li>
@@ -135,15 +167,8 @@ const badges = computed(() => [
     <div class="detail">
       <div class="container">
         <h2 v-reveal class="detail__title">{{ t('detail.aboutTitle') }}</h2>
-        <div class="detail__grid">
-          <div v-reveal>
-            <h3 class="detail__sub">{{ t('detail.tavsifTitle') }}</h3>
-            <p class="detail__text">{{ product.tavsif }}</p>
-          </div>
-          <div v-reveal="100">
-            <h3 class="detail__sub">{{ t('detail.saqlashTitle') }}</h3>
-            <p class="detail__text">{{ product.saqlash }}</p>
-          </div>
+        <div v-reveal>
+          <p class="detail__text">{{ tr(product?.description) }}</p>
         </div>
       </div>
     </div>
@@ -154,18 +179,18 @@ const badges = computed(() => [
       <div class="cards">
         <router-link
           v-for="(p, i) in related"
-          :key="p.slug"
-          :to="`/mahsulotlar/${p.slug}`"
+          :key="p.id"
+          :to="`/mahsulotlar/${p.id}`"
           v-reveal3d="i * 70"
           class="card"
         >
           <div class="card__media">
-            <img :src="productImg" :alt="p.title" />
+            <img :src="p.image || productImg" :alt="tr(p.title)" />
           </div>
           <div class="card__body">
-            <span class="card__chip">{{ p.tag }}</span>
-            <h3 class="card__title">{{ p.title }}</h3>
-            <p class="card__text">{{ p.short }}</p>
+            <span class="card__chip">{{ tr(p.category_name) }}</span>
+            <h3 class="card__title">{{ tr(p.title) }}</h3>
+            <p class="card__text">{{ tr(p.short_description) }}</p>
             <span class="card__link">
               {{ t('detail.detailLink') }}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">

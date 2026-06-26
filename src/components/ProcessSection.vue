@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import processImg from '../assets/images/photo-qadoqlash.png'
+import processImgMobile from '../assets/images/photo-qadoqlash.svg'
 import { useI18n } from '../i18n/index.js'
 
 const { t } = useI18n()
@@ -73,7 +74,8 @@ const steps = computed(() =>
         </li>
       </ol>
 
-      <img v-reveal3d.pop :src="processImg" class="process__photo" alt="Qadoqlash liniyasi" />
+      <img v-reveal3d.pop :src="processImg" class="process__photo process__photo--desktop" alt="Qadoqlash liniyasi" />
+      <img v-reveal3d.pop :src="processImgMobile" class="process__photo process__photo--mobile" alt="Qadoqlash liniyasi" />
     </div>
   </section>
 </template>
@@ -215,6 +217,11 @@ const steps = computed(() =>
   object-fit: cover;
 }
 
+/* SVG variant is used only on the mobile layout */
+.process__photo--mobile {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .step__num,
   .steps--run .step__num {
@@ -262,6 +269,32 @@ const steps = computed(() =>
     margin-bottom: 0;
   }
 
+  /* vertical connector running down through the number circles */
+  .step__line {
+    display: block;
+    top: 52px;
+    bottom: -28px;
+    left: 21px;
+    right: auto;
+    border-top: none;
+    border-left: 2px dashed #f1c8a8;
+  }
+
+  .step__fill {
+    top: 0;
+    bottom: 0;
+    left: -2px;
+    right: auto;
+    border-top: none;
+    border-left: 2px solid var(--orange);
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+
+  .steps--run .step__fill {
+    transform: scaleY(1);
+  }
+
   .step__title {
     margin-top: 0;
   }
@@ -270,8 +303,16 @@ const steps = computed(() =>
     max-width: none;
   }
 
-  .process__photo {
-    aspect-ratio: 3 / 4;
+  /* swap PNG for the SVG at the bottom of the section on mobile */
+  .process__photo--desktop {
+    display: none;
+  }
+
+  .process__photo--mobile {
+    display: block;
+    aspect-ratio: auto;
+    height: auto;
+    object-fit: contain;
   }
 }
 </style>

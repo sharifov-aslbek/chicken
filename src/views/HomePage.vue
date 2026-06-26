@@ -8,6 +8,16 @@ import ProcessSection from '../components/ProcessSection.vue'
 import TestimonialsSection from '../components/TestimonialsSection.vue'
 import FaqSection from '../components/FaqSection.vue'
 import ContactSection from '../components/ContactSection.vue'
+import { useOverallStore } from '../store/overall.js'
+import { onMounted , ref } from 'vue'
+import { useI18n } from '../i18n/index.js'
+
+const store = useOverallStore();
+const i18n = useI18n();
+
+onMounted(() => {
+  store.getHome();
+})
 </script>
 
 <template>

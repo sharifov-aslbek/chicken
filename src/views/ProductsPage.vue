@@ -1,19 +1,50 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { getCategories, getProducts } from '../data/products.js'
+import { ref, computed, onMounted, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import productImg from '../assets/images/StaticProduct.png'
 import { useI18n } from '../i18n/index.js'
+import { useOverallStore } from '../store/overall.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const store = useOverallStore()
+const { category, products } = storeToRefs(store)
 
-const categories = computed(() => getCategories())
-const activeIndex = ref(0) // 0 = "Barchasi" / "Все"
+// API text fields are { uz, ru, en } objects — pick the active locale, fall back to UZ.
+function tr(field) {
+  if (!field) return ''
+  if (typeof field === 'string') return field
+  return field[locale.value] || field.uz || ''
+}
 
-const visible = computed(() => {
-  const all = getProducts()
-  if (activeIndex.value === 0) return all
-  const tag = categories.value[activeIndex.value]
-  return all.filter((p) => p.tag === tag)
+const allLabel = computed(
+  () => ({ uz: 'Barchasi', ru: 'Все', en: 'All' }[locale.value] || 'Barchasi')
+)
+
+// "All" chip first, then one chip per API category.
+const filters = computed(() => [
+  { id: null, name: allLabel.value },
+  ...(category.value || []).map((c) => ({ id: c.id, name: tr(c.name) })),
+])
+const activeIndex = ref(0) // 0 = "All"
+
+const visible = computed(() => products.value || [])
+
+function loadProducts() {
+  const cat = filters.value[activeIndex.value]
+  // "All" (id null) hits the full list; a real category uses its own endpoint.
+  if (cat?.id != null) {
+    store.getCategoryProducts(cat.id, { limit: 50 })
+  } else {
+    store.getProducts({ limit: 50 })
+  }
+}
+
+onMounted(() => {
+  if (!category.value) store.getCategories()
+  loadProducts()
 })
+
+watch(activeIndex, loadProducts)
 </script>
 
 <template>
@@ -40,32 +71,33 @@ const visible = computed(() => {
     <div class="catalog container">
       <div v-reveal class="filters">
         <button
-          v-for="(c, i) in categories"
+          v-for="(c, i) in filters"
           :key="i"
           class="filter"
           :class="{ 'filter--active': i === activeIndex }"
           @click="activeIndex = i"
         >
-          {{ c }}
+          {{ c.name }}
         </button>
       </div>
 
       <transition-group name="card-list" tag="div" class="cards">
         <router-link
           v-for="p in visible"
-          :key="p.slug"
-          :to="`/mahsulotlar/${p.slug}`"
+          :key="p.id"
+          :to="`/mahsulotlar/${p.id}`"
           class="card"
         >
           <div class="card__media field-ph">
-            <svg class="field-ph__icon" viewBox="0 0 24 24" fill="none">
+            <img v-if="p.image" :src="p.image" :alt="tr(p.title)" class="card__img" />
+            <svg v-else class="field-ph__icon" viewBox="0 0 24 24" fill="none">
               <path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
           <div class="card__body">
-            <span class="card__chip">{{ p.tag }}</span>
-            <h3 class="card__title">{{ p.title }}</h3>
-            <p class="card__text">{{ p.short }}</p>
+            <span class="card__chip">{{ tr(p.category_name) }}</span>
+            <h3 class="card__title">{{ tr(p.title) }}</h3>
+            <p class="card__text">{{ tr(p.short_description) }}</p>
             <span class="card__link">
               {{ t('catalog.detail') }}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -190,6 +222,13 @@ const visible = computed(() => {
 
 .card__media {
   aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .card__body {

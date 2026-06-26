@@ -125,6 +125,10 @@
 
 html {
   scroll-behavior: smooth;
+  /* Scroll-reveal animations translate elements horizontally before they
+     enter view; clip (not hidden, so position:sticky still works) keeps that
+     off-screen offset from producing a horizontal scrollbar on mobile. */
+  overflow-x: clip;
 }
 
 body {

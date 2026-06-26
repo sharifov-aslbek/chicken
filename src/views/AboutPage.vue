@@ -27,8 +27,10 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
       </div>
     </div>
 
-    <!-- Team banner (full-bleed) -->
-    <div v-reveal3d.pop class="banner" role="img" :aria-label="t('aboutP.title')"></div>
+    <!-- Team banner -->
+    <div class="container">
+      <div v-reveal3d.pop class="banner" role="img" :aria-label="t('aboutP.title')"></div>
+    </div>
 
     <!-- Story -->
     <div class="story">
@@ -163,6 +165,7 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
   position: relative;
   min-height: 951px;
   background: #fff;
+  margin-bottom: 120px;
 }
 
 /* Text column stays inside the container; vertically centered. */
@@ -379,6 +382,7 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
 @media (max-width: 980px) {
   .story {
     min-height: 0;
+    margin-bottom: 40px;
   }
   .story__inner {
     display: block;

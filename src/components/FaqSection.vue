@@ -46,7 +46,9 @@ function toggle(i) {
               </svg>
             </span>
           </button>
-          <div v-show="openIndex === i" class="faq__a">{{ f.a }}</div>
+          <transition name="faq-drop">
+            <div v-if="openIndex === i" class="faq__a">{{ f.a }}</div>
+          </transition>
         </li>
       </ul>
     </div>
@@ -167,6 +169,39 @@ function toggle(i) {
   color: var(--muted);
   line-height: 1.6;
   max-width: 620px;
+  overflow: hidden;
+}
+
+/* iOS-notification style drop: springy slide-down with a slight overshoot. */
+.faq-drop-enter-active {
+  transition: max-height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.32s ease,
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.faq-drop-leave-active {
+  transition: max-height 0.28s ease, opacity 0.18s ease, transform 0.28s ease;
+}
+
+.faq-drop-enter-from,
+.faq-drop-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-14px);
+}
+
+.faq-drop-enter-to,
+.faq-drop-leave-from {
+  max-height: 260px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-drop-enter-active,
+  .faq-drop-leave-active {
+    transition: opacity 0.15s ease;
+  }
 }
 
 @media (max-width: 920px) {
