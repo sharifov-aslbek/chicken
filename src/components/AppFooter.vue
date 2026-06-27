@@ -1,10 +1,7 @@
 <script setup>
 import BrandLogo from './BrandLogo.vue'
+import AppIcon from './AppIcon.vue'
 import { useI18n } from '../i18n/index.js'
-import socTelegram from '../assets/images/footer-social-media-icons/Icon 5/send.png'
-import socInstagram from '../assets/images/footer-social-media-icons/Icon 6/instagram.png'
-import socFacebook from '../assets/images/footer-social-media-icons/Icon 7/facebook.png'
-import socYoutube from '../assets/images/footer-social-media-icons/Icon 8/youtube.png'
 
 const { t } = useI18n()
 
@@ -18,10 +15,10 @@ const pages = [
 ]
 
 const socials = [
-  { src: socTelegram, label: 'Telegram', href: 'https://t.me/caravan_chicken' },
-  { src: socInstagram, label: 'Instagram', href: '#' },
-  { src: socFacebook, label: 'Facebook', href: '#' },
-  { src: socYoutube, label: 'YouTube', href: '#' },
+  { icon: 'telegram', label: 'Telegram', href: 'https://t.me/caravan_chicken' },
+  { icon: 'instagram', label: 'Instagram', href: '#' },
+  { icon: 'facebook', label: 'Facebook', href: '#' },
+  { icon: 'youtube', label: 'YouTube', href: '#' },
 ]
 </script>
 
@@ -34,7 +31,7 @@ const socials = [
           <p class="footer__desc">{{ t('footer.desc') }}</p>
           <div class="footer__socials">
             <a v-for="s in socials" :key="s.label" :href="s.href" class="social" :aria-label="s.label">
-              <img :src="s.src" :alt="s.label" width="19" height="19" />
+              <AppIcon :name="s.icon" />
             </a>
           </div>
         </div>
@@ -158,10 +155,9 @@ const socials = [
   background: var(--orange);
 }
 
-.social img {
+.social :deep(.icon) {
   width: 19px;
   height: 19px;
-  object-fit: contain;
 }
 
 .footer__title {

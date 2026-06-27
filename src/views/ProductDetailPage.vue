@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import productImg from '../assets/images/StaticProduct.png'
 import { useI18n } from '../i18n/index.js'
 import { useOverallStore } from '../store/overall.js'
+import { mediaUrl } from '../utils/media.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -20,7 +21,7 @@ function tr(field) {
 
 // Gallery images come from the API; fall back to the static placeholder.
 const slides = computed(() => {
-  const imgs = (product.value?.images || []).filter(Boolean)
+  const imgs = (product.value?.images || []).filter(Boolean).map(mediaUrl)
   return imgs.length ? imgs : [productImg]
 })
 
@@ -185,7 +186,7 @@ const badges = computed(() => [
           class="card"
         >
           <div class="card__media">
-            <img :src="p.image || productImg" :alt="tr(p.title)" />
+            <img :src="p.image ? mediaUrl(p.image) : productImg" :alt="tr(p.title)" />
           </div>
           <div class="card__body">
             <span class="card__chip">{{ tr(p.category_name) }}</span>

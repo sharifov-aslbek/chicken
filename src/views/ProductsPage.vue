@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import productImg from '../assets/images/StaticProduct.png'
 import { useI18n } from '../i18n/index.js'
 import { useOverallStore } from '../store/overall.js'
+import { mediaUrl } from '../utils/media.js'
 
 const { t, locale } = useI18n()
 const store = useOverallStore()
@@ -89,7 +90,7 @@ watch(activeIndex, loadProducts)
           class="card"
         >
           <div class="card__media field-ph">
-            <img v-if="p.image" :src="p.image" :alt="tr(p.title)" class="card__img" />
+            <img v-if="p.image" :src="mediaUrl(p.image)" :alt="tr(p.title)" class="card__img" />
             <svg v-else class="field-ph__icon" viewBox="0 0 24 24" fill="none">
               <path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>

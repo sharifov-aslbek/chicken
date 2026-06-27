@@ -1,20 +1,17 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from '../i18n/index.js'
-import iconPhone from '../assets/images/connectpage/Icon/Vector.png'
-import iconSend from '../assets/images/connectpage/Icon 2/send.png'
-import iconPin from '../assets/images/connectpage/Icon 3/map-pin.png'
-import iconClock from '../assets/images/connectpage/Icon 4/clock.png'
+import AppIcon from '../components/AppIcon.vue'
 
 const { t } = useI18n()
 
 const role = ref('b2b')
 
 const cardMeta = [
-  { src: iconPhone, href: 'tel:+998712002111' },
-  { src: iconSend, href: 'https://t.me/caravan_chicken' },
-  { src: iconPin, href: '#' },
-  { src: iconClock, href: '#' },
+  { icon: 'phone', href: 'tel:+998712002111' },
+  { icon: 'telegram', href: 'https://t.me/caravan_chicken' },
+  { icon: 'pin', href: '#' },
+  { icon: 'clock', href: '#' },
 ]
 const cards = computed(() => t('contactP.cards').map((c, i) => ({ ...c, ...cardMeta[i] })))
 
@@ -48,7 +45,7 @@ function onSubmit() {
           class="info__card"
         >
           <span class="info__icon">
-            <img :src="c.src" :alt="c.label" width="22" height="22" />
+            <AppIcon :name="c.icon" />
           </span>
           <span class="info__body">
             <span class="info__label">{{ c.label }}</span>
@@ -184,10 +181,9 @@ function onSubmit() {
   place-items: center;
 }
 
-.info__icon img {
+.info__icon :deep(.icon) {
   width: 22px;
   height: 22px;
-  object-fit: contain;
 }
 
 .info__body {

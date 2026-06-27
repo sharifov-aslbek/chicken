@@ -4,6 +4,8 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from '../i18n/index.js'
 import videoImg from '../assets/images/VideoPlayer.png'
 import { useOverallStore } from '../store/overall.js'
+import { mediaUrl } from '../utils/media.js'
+import { RouterLink } from 'vue-router'
 
 const { t, locale } = useI18n()
 const store = useOverallStore()
@@ -49,12 +51,12 @@ const visible = computed(() => categories.value[activeIndex.value]?.products || 
             {{ t('prod.lead') }}
           </p>
         </div>
-        <a v-reveal.right="120" href="#all" class="products__all">
+        <router-link v-reveal.right="120" to="mahsulotlar" class="products__all">
           {{ t('prod.all') }}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
             <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-        </a>
+        </router-link>
       </div>
 
       <div v-reveal class="filters">
@@ -72,7 +74,7 @@ const visible = computed(() => categories.value[activeIndex.value]?.products || 
       <div class="cards">
         <article v-for="(p, i) in visible" :key="p.id" v-scroll3d class="card">
           <div v-reveal3d.pop class="card__media img-ph">
-            <img v-if="p.image" :src="p.image" :alt="tr(p.title)" class="card__img" />
+            <img v-if="p.image" :src="mediaUrl(p.image)" :alt="tr(p.title)" class="card__img" />
             <svg v-else class="card__ph-icon" viewBox="0 0 24 24" fill="none">
               <path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
