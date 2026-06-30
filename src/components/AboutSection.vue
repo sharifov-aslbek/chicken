@@ -63,6 +63,7 @@ const features = computed(() =>
   min-height: 812px;
 }
 
+
 .about__grid {
   display: grid;
   grid-template-columns: 650px 1fr;
@@ -165,6 +166,31 @@ const features = computed(() =>
   pointer-events: none;
   z-index: 2;
   background: linear-gradient(to top, #fff6ec 0%, rgba(255, 246, 236, 0) 100%);
+}
+
+/* Tablet / narrow desktop: shrink the photo so it no longer overlaps the
+   text and everything stays fully visible before the mobile layout. */
+@media (max-width: 1240px) and (min-width: 981px) {
+  .about,
+  .about__grid {
+    min-height: 680px;
+  }
+
+  .about__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about__content {
+    padding-right: 44%;
+  }
+
+  .about__title {
+    font-size: 40px;
+  }
+
+  .about__media {
+    width: 42%;
+  }
 }
 
 @media (max-width: 980px) {

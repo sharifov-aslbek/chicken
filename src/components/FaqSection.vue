@@ -109,6 +109,10 @@ function toggle(i) {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  /* Reserve enough height for the tallest open state (all items collapsed
+     + one answer expanded) so toggling +/- never changes the section
+     height and shifts the content below. */
+  min-height: 760px;
 }
 
 .faq__item {
@@ -212,6 +216,10 @@ function toggle(i) {
 
   .faq__head {
     position: static;
+  }
+
+  .faq__list {
+    min-height: 0;
   }
 
   .faq__lead {

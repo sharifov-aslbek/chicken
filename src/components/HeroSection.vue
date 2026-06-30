@@ -52,7 +52,6 @@ const tags = computed(() => t('hero.tags'))
   background: linear-gradient(180deg, #ff540a 0%, #ff8049 100%);
   color: #fff;
   overflow: hidden;
-  border-radius: 0 0 40px 40px;
 }
 
 .hero__grid {
@@ -120,15 +119,23 @@ const tags = computed(() => t('hero.tags'))
   top: 0;
   right: 0;
   bottom: 0;
-  width: 55%;
+  width: 60%;
   background-image: url('../assets/images/Union.png');
   background-repeat: no-repeat;
   background-position: right top;
-  background-size: auto 165%;
+  background-size: auto 188%;
 }
 
 .hero__img--mobile {
   display: none;
+}
+
+/* Tablet / narrow desktop: shrink the photo so it no longer overlaps the
+   hero title before the mobile layout kicks in. */
+@media (max-width: 1240px) and (min-width: 981px) {
+  .hero__media {
+    width: 46%;
+  }
 }
 
 @media (max-width: 980px) {
@@ -155,10 +162,6 @@ const tags = computed(() => t('hero.tags'))
 }
 
 @media (max-width: 640px) {
-  .hero {
-    border-radius: 0 0 28px 28px;
-  }
-
   .hero__grid {
     gap: 0;
     padding-top: 96px;

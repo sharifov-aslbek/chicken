@@ -128,14 +128,20 @@ const lightBar = computed(() => route.name === 'contact' || route.name === 'prod
   background: transparent;
 }
 
+/* Desktop: header pill spans up to 1360px wide and stands 84px tall. */
+.header .container {
+  max-width: calc(1360px + 48px);
+}
+
 .bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+  min-height: 84px;
   background: var(--cream);
   border-radius: var(--radius-pill);
-  padding: 10px 12px 10px 22px;
+  padding: 10px 12px 10px 28px;
   box-shadow: var(--shadow-sm);
 }
 

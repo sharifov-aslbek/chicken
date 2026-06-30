@@ -131,6 +131,20 @@ html {
   overflow-x: clip;
 }
 
+/* On phones, hide the visible scrollbar line on the right while keeping
+   scrolling fully functional. */
+@media (max-width: 768px) {
+  html {
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* old Edge/IE */
+  }
+  html::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;                /* Chrome, Safari */
+  }
+}
+
 body {
   font-family: var(--font-body);
   color: var(--ink);

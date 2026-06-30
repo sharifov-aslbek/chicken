@@ -1,6 +1,6 @@
 <script setup>
-import logoDark from '../assets/images/logo-darker.png'
-import logoWhite from '../assets/images/logo-white-text.png'
+import logoDark from '../assets/images/logo.svg'
+import logoWhite from '../assets/images/logo-white.svg'
 
 defineProps({
   light: { type: Boolean, default: false },
