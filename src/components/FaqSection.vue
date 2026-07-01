@@ -46,9 +46,11 @@ function toggle(i) {
               </svg>
             </span>
           </button>
-          <transition name="faq-drop">
-            <div v-if="openIndex === i" class="faq__a">{{ f.a }}</div>
-          </transition>
+          <div class="faq__a-wrap" :class="{ 'faq__a-wrap--open': openIndex === i }">
+            <div class="faq__a-inner">
+              <div class="faq__a">{{ f.a }}</div>
+            </div>
+          </div>
         </li>
       </ul>
     </div>
@@ -173,37 +175,36 @@ function toggle(i) {
   color: var(--muted);
   line-height: 1.6;
   max-width: 620px;
+}
+
+/* Accordion via grid-template-rows 0fr -> 1fr: animates to the exact answer
+   height (no max-height guessing, so no dead time / lag), and stays fully
+   contained by .faq__list's reserved min-height so the section below never
+   shifts while opening or closing. */
+.faq__a-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+
+.faq__a-wrap--open {
+  grid-template-rows: 1fr;
+}
+
+.faq__a-inner {
   overflow: hidden;
-}
-
-/* iOS-notification style drop: springy slide-down with a slight overshoot. */
-.faq-drop-enter-active {
-  transition: max-height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.32s ease,
-    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.faq-drop-leave-active {
-  transition: max-height 0.28s ease, opacity 0.18s ease, transform 0.28s ease;
-}
-
-.faq-drop-enter-from,
-.faq-drop-leave-to {
-  max-height: 0;
   opacity: 0;
-  transform: translateY(-14px);
+  transition: opacity 0.2s ease;
 }
 
-.faq-drop-enter-to,
-.faq-drop-leave-from {
-  max-height: 260px;
+.faq__a-wrap--open .faq__a-inner {
   opacity: 1;
-  transform: translateY(0);
+  transition: opacity 0.24s ease 0.08s;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .faq-drop-enter-active,
-  .faq-drop-leave-active {
+  .faq__a-wrap,
+  .faq__a-inner {
     transition: opacity 0.15s ease;
   }
 }
