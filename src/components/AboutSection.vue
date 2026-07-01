@@ -157,6 +157,26 @@ const features = computed(() =>
   display: none;
 }
 
+/* Desktop and above: keep the section bounded to the 1200px container and
+   anchor the photo to it (instead of the viewport edge), so this section lines
+   up with the rest of the page at any width — normal desktop or zoomed out.
+   The rule is continuous at 1440px (equals the full-bleed behaviour there), so
+   ~1440 screens are unchanged; wider screens are reined into the container. */
+@media (min-width: 1241px) {
+  .about__grid {
+    position: relative;
+  }
+
+  /* Reproduce the 1440 design frame relative to the 1200 container so the
+     photo keeps its ideal placement (same crop, arc and shadow).
+     Bleed past the container = (1440 - 1200) / 2 = 120px; the image is 1040×812
+     so at 72% of 1440 it sits at its natural size. */
+  .about__media {
+    right: -120px;
+    width: 1040px;
+  }
+}
+
 .about__fade {
   position: absolute;
   left: 0;

@@ -130,6 +130,25 @@ const tags = computed(() => t('hero.tags'))
   display: none;
 }
 
+/* Desktop and above: keep the section bounded to the 1200px container and
+   anchor the photo to it (instead of the viewport edge), so this section lines
+   up with the rest of the page at any width — normal desktop or zoomed out.
+   The rule is continuous at 1440px (equals the full-bleed behaviour there), so
+   ~1440 screens are unchanged; wider screens are reined into the container. */
+@media (min-width: 1241px) {
+  .hero__grid {
+    position: relative;
+  }
+
+  /* Reproduce the 1440 design frame relative to the 1200 container so the
+     photo keeps its ideal placement (same crop, arc and shadow).
+     Bleed past the container = (1440 - 1200) / 2 = 120px; width = 60% of 1440. */
+  .hero__media {
+    right: -120px;
+    width: 864px;
+  }
+}
+
 /* Tablet / narrow desktop: shrink the photo so it no longer overlaps the
    hero title before the mobile layout kicks in. */
 @media (max-width: 1240px) and (min-width: 981px) {
