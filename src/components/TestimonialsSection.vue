@@ -19,6 +19,11 @@ const reduceMotion =
 function clearTimers() {
   timers.forEach((id) => clearTimeout(id))
   timers.length = 0
+  typing.clear()
+  if (raf) {
+    cancelAnimationFrame(raf)
+    raf = 0
+  }
 }
 
 function fullText(i) {
@@ -30,19 +35,27 @@ function reset() {
   finished.value = reviews.value.map(() => false)
 }
 
-function typeCard(i) {
-  const full = fullText(i)
-  let n = 0
-  const step = () => {
+// Single rAF loop drives every typing card — frame-aligned, no timer churn.
+const CHAR_MS = 20
+const typing = new Map() // card index -> start timestamp
+let raf = 0
+
+function tick(now) {
+  typing.forEach((start, i) => {
+    const full = fullText(i)
+    const n = Math.min(full.length, Math.floor((now - start) / CHAR_MS))
     typed.value[i] = full.slice(0, n)
-    if (n < full.length) {
-      n += 1
-      timers.push(setTimeout(step, 22))
-    } else {
+    if (n >= full.length) {
       finished.value[i] = true
+      typing.delete(i)
     }
-  }
-  step()
+  })
+  raf = typing.size ? requestAnimationFrame(tick) : 0
+}
+
+function typeCard(i) {
+  typing.set(i, performance.now())
+  if (!raf) raf = requestAnimationFrame(tick)
 }
 
 function showInstantly() {
@@ -103,8 +116,7 @@ onBeforeUnmount(() => {
           :key="r.name"
           :ref="(el) => { if (el) cardEls[i] = el.$el || el }"
           :data-idx="i"
-          v-scroll3d="{ tilt: 6 }"
-          v-reveal3d.cascade="i * 110"
+          v-reveal3d="i * 120"
           class="review"
         >
           <div class="review__top">
@@ -169,6 +181,20 @@ onBeforeUnmount(() => {
   flex-direction: column;
 }
 
+/* Softer take on the global reveal3d entrance: same flip-up-from-below
+   character, but a gentler angle and shorter travel so it feels light. */
+.review.reveal3d {
+  transform: perspective(900px) rotateX(-7deg) translateY(24px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.review.reveal3d.is-revealed {
+  opacity: 1;
+  transform: perspective(900px) rotateX(0) translateY(0);
+}
+
 .review__top {
   display: flex;
   align-items: center;
@@ -186,9 +212,7 @@ onBeforeUnmount(() => {
   width: 18px;
   height: 18px;
   transform-origin: center;
-  transition:
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    filter 0.25s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* staggered "pop + spin-in" once the card reveals */
@@ -208,10 +232,9 @@ onBeforeUnmount(() => {
   100% { opacity: 1; transform: scale(1) rotate(0); }
 }
 
-/* hover: stars lift in a little wave and glow */
+/* hover: stars lift in a little wave (transform only — compositor cheap) */
 .review:hover .review__stars svg {
-  transform: scale(1.2) rotate(-8deg);
-  filter: drop-shadow(0 2px 5px rgba(242, 88, 12, 0.55));
+  transform: scale(1.18) rotate(-8deg);
 }
 .review:hover .review__stars svg:nth-child(1) { transition-delay: 0s; }
 .review:hover .review__stars svg:nth-child(2) { transition-delay: 0.05s; }
