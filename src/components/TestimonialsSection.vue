@@ -1,9 +1,15 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '../i18n/index.js'
+import logoOqtepa from '../assets/images/brendlarnimadeydi/Oqtepa logo.png'
+import logoBbq from '../assets/images/brendlarnimadeydi/BBQ burger.png'
+import logoChef from '../assets/images/brendlarnimadeydi/Shef Burger.png'
 
 const { t, locale } = useI18n()
 const reviews = computed(() => t('reviews.items'))
+
+// Card order matches reviews.items: Oqtepa Lavash, BBQ Burger, Chef Burger.
+const logos = [logoOqtepa, logoBbq, logoChef]
 
 // Typewriter state, one entry per review card.
 const typed = ref([])
@@ -125,7 +131,7 @@ onBeforeUnmount(() => {
                 <path d="M12 3l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9 6.8 19l1-5.8L3.6 9.1l5.8-.8L12 3Z" />
               </svg>
             </div>
-            <span class="review__logo">LOGO</span>
+            <img class="review__logo" :src="logos[i]" :alt="r.company" loading="lazy" />
           </div>
           <p class="review__text">
             <span class="review__sizer" aria-hidden="true">"{{ r.text }}"</span>
@@ -205,7 +211,7 @@ onBeforeUnmount(() => {
 .review__stars {
   display: inline-flex;
   gap: 4px;
-  color: var(--orange);
+  color: var(--gold-500, rgba(232, 176, 75, 1));
 }
 
 .review__stars svg {
@@ -253,13 +259,11 @@ onBeforeUnmount(() => {
 }
 
 .review__logo {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--muted-2);
-  background: var(--card-cream);
-  border-radius: var(--radius-pill);
-  padding: 6px 14px;
+  width: 78px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .review__text {
@@ -337,11 +341,22 @@ onBeforeUnmount(() => {
   color: var(--muted);
 }
 
+/* Tablet: 3 narrow columns — long quotes need a smaller size to breathe. */
+@media (max-width: 1240px) {
+  .review__text {
+    font-size: 16px;
+  }
+}
+
 @media (max-width: 900px) {
   .reviews__grid {
     grid-template-columns: 1fr;
     max-width: 480px;
     margin: 0 auto;
+  }
+
+  .review__text {
+    font-size: 18px;
   }
 }
 </style>

@@ -84,9 +84,9 @@ export const messages = {
       eyebrow: 'Mijozlar fikri',
       title: 'Bizga ishongan brendlar nima deydi?',
       items: [
-        { text: "Caravan Chicken bilan ishlay boshlaganimizdan beri ta'minot uzilishini umuman ko'rmadik. Sifat barqaror.", name: 'Akmal Karimov', company: '"Osh Markazi" restorani' },
-        { text: 'Halollik kafolati biz uchun eng muhim. Mijozlarimizga ishonch bilan taklif qilamiz.', name: 'Dilnoza Yusupova', company: '"Family Cafe"' },
-        { text: 'Yarim tayyor mahsulotlar menyumizni tezlashtirdi — buyurtma 6 daqiqada tayyor.', name: 'Sardor Aliyev', company: '"Tez Lunch" fastfood' },
+        { text: "Caravan Chicken bilan 7–8 yildan buyon samarali hamkorlik qilib kelmoqdamiz. Shu vaqt davomida ular biror marta ham bizni noqulay vaziyatda qoldirmagan. Mahsulotlar doimo sifatli, halol va yuqori gigiyena talablariga javob beradi. Eng muhimi, yirik hajmdagi buyurtmalarni ham o'z vaqtida va uzluksiz yetkazib berishadi. Narxlarning barqarorligi va mas'uliyatli yondashuvi biz uchun juda muhim. Caravan Chicken — ishonchli hamkor va biz ularni bemalol tavsiya qilamiz.", name: 'Azizbek Aka', company: 'Oqtepa Lavash' },
+        { text: "Caravan Chicken bilan uzoq yildan buyon muvaffaqiyatli hamkorlik qilib kelamiz. Ularni tanlashimizning asosiy sababi — mahsulot sifati, halolligi, tozaligi va buyurtmalarni har doim o'z vaqtida yetkazib berishidir. Yirik hajmdagi buyurtmalarda ham bir xil sifatni saqlab qolishlari, kuchli sifat nazorati va ishiga mas'uliyat bilan yondashishi bizning ishonchimizni yanada mustahkamlagan. Bu hamkorlikdan mamnunmiz va kelgusida ham davom ettirishni istaymiz.", name: 'Diyorbek Aka', company: 'BBQ Burger' },
+        { text: "Chef Burger jamoasi sifatida Caravan Chicken bilan hamkorligimizdan mamnunmiz. Biz uchun mahsulot sifati, barqaror ta'm va ishonchli yetkazib berish eng muhim mezonlardan hisoblanadi. Caravan Chicken bu talablarning barchasini doimiy ravishda yuqori darajada ta'minlab kelmoqda. Ularning mas'uliyati, halolligi va mijozlarga bo'lgan yondashuvi bizning ishonchimizni mustahkamlagan. Ishonchli hamkor sifatida Caravan Chicken'ni mamnuniyat bilan tavsiya qilamiz.", name: 'Alisher Aka', company: 'Chef Burger' },
       ],
     },
 
@@ -295,9 +295,9 @@ export const messages = {
       eyebrow: 'Отзывы клиентов',
       title: 'Что говорят доверяющие нам бренды?',
       items: [
-        { text: 'С начала работы с Caravan Chicken мы вообще не сталкивались с перебоями поставок. Качество стабильное.', name: 'Акмаль Каримов', company: 'ресторан «Ош Маркази»' },
-        { text: 'Гарантия халяльности для нас важнее всего. Мы с уверенностью предлагаем продукцию нашим клиентам.', name: 'Дилноза Юсупова', company: '«Family Cafe»' },
-        { text: 'Полуфабрикаты ускорили наше меню — заказ готов за 6 минут.', name: 'Сардор Алиев', company: 'фастфуд «Tez Lunch»' },
+        { text: 'Мы эффективно сотрудничаем с Caravan Chicken уже 7–8 лет. За это время они ни разу не поставили нас в неудобное положение. Продукция всегда качественная, халяльная и отвечает высоким требованиям гигиены. Самое главное — даже крупные заказы доставляются вовремя и без перебоев. Стабильность цен и ответственный подход очень важны для нас. Caravan Chicken — надёжный партнёр, и мы смело их рекомендуем.', name: 'Азизбек ака', company: 'Oqtepa Lavash' },
+        { text: 'Мы много лет успешно сотрудничаем с Caravan Chicken. Главные причины нашего выбора — качество продукции, халяльность, чистота и своевременная доставка заказов. Сохранение одинакового качества даже в крупных заказах, строгий контроль качества и ответственное отношение к работе ещё больше укрепили наше доверие. Мы довольны этим сотрудничеством и хотим продолжать его и в будущем.', name: 'Диёрбек ака', company: 'BBQ Burger' },
+        { text: 'Команда Chef Burger довольна сотрудничеством с Caravan Chicken. Для нас важнейшие критерии — качество продукции, стабильный вкус и надёжная доставка. Caravan Chicken постоянно обеспечивает все эти требования на высоком уровне. Их ответственность, халяльность и подход к клиентам укрепили наше доверие. Мы с удовольствием рекомендуем Caravan Chicken как надёжного партнёра.', name: 'Алишер ака', company: 'Chef Burger' },
       ],
     },
 
@@ -506,9 +506,9 @@ export const messages = {
       eyebrow: 'Customer reviews',
       title: 'What do the brands that trust us say?',
       items: [
-        { text: 'Since we started working with Caravan Chicken, we have not seen a single supply interruption. The quality is consistent.', name: 'Akmal Karimov', company: '"Osh Markazi" restaurant' },
-        { text: 'The halal guarantee matters most to us. We confidently offer it to our customers.', name: 'Dilnoza Yusupova', company: '"Family Cafe"' },
-        { text: 'Semi-finished products sped up our menu — an order is ready in 6 minutes.', name: 'Sardor Aliyev', company: '"Tez Lunch" fast food' },
+        { text: 'We have been working effectively with Caravan Chicken for 7–8 years. In all that time they have never once let us down. The products are always high quality, halal and meet strict hygiene standards. Most importantly, even large orders are delivered on time and without interruption. Stable prices and a responsible approach matter a lot to us. Caravan Chicken is a reliable partner and we confidently recommend them.', name: 'Azizbek Aka', company: 'Oqtepa Lavash' },
+        { text: 'We have been successfully cooperating with Caravan Chicken for many years. The main reasons we chose them are product quality, halal integrity, cleanliness and always-on-time delivery. Maintaining the same quality even on large orders, strong quality control and a responsible attitude to work have only strengthened our trust. We are happy with this partnership and want to continue it in the future.', name: 'Diyorbek Aka', company: 'BBQ Burger' },
+        { text: 'As the Chef Burger team, we are pleased with our partnership with Caravan Chicken. Product quality, consistent taste and reliable delivery are our most important criteria, and Caravan Chicken consistently delivers on all of them at a high level. Their responsibility, halal integrity and approach to clients have strengthened our trust. We gladly recommend Caravan Chicken as a reliable partner.', name: 'Alisher Aka', company: 'Chef Burger' },
       ],
     },
 

@@ -52,8 +52,9 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
     </div>
 
     <!-- Stats -->
-    <div class="container stats">
-      <div v-for="(s, i) in stats" :key="s.label" v-reveal="i * 90" class="stat">
+    <div class="stats-band">
+      <div class="container stats">
+        <div v-for="(s, i) in stats" :key="s.label" v-reveal="i * 90" class="stat">
         <span class="stat__icon">
           <svg v-if="s.icon === 'users'" viewBox="0 0 24 24" fill="none">
             <circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.7" />
@@ -64,18 +65,17 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
             <path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
           </svg>
           <svg v-else-if="s.icon === 'grid'" viewBox="0 0 24 24" fill="none">
-            <rect x="4" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.7" />
-            <rect x="13" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.7" />
-            <rect x="4" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.7" />
-            <rect x="13" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.7" />
+            <path d="M12 3l8.5 4.5L12 12 3.5 7.5 12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            <path d="M20.5 12L12 16.5 3.5 12M20.5 16.5L12 21l-8.5-4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           <svg v-else viewBox="0 0 24 24" fill="none">
-            <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-            <circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.7" />
+            <path d="M9 4.5L4 6.5v13l5-2 6 2 5-2v-13l-5 2-6-2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            <path d="M9 4.5v13M15 6.5v13" stroke="currentColor" stroke-width="1.7" />
           </svg>
         </span>
         <strong class="stat__value">{{ s.value }}</strong>
         <span class="stat__label">{{ s.label }}</span>
+      </div>
       </div>
     </div>
 
@@ -165,7 +165,6 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
   position: relative;
   min-height: 951px;
   background: #fff;
-  margin-bottom: 120px;
 }
 
 /* Text column stays inside the container; vertically centered. */
@@ -238,30 +237,37 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
   opacity: 0.95;
 }
 
+/* Full-width cream band, flush against the story section above. */
+.stats-band {
+  background: var(--cream);
+  padding: 88px 0;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
-  padding-top: 72px;
-  padding-bottom: 30px;
 }
 
 .stat {
-  background: var(--cream);
-  border-radius: var(--radius);
-  padding: 28px 24px;
-  text-align: center;
+  text-align: left;
+  padding: 4px 24px 4px 0;
+}
+
+/* Thin vertical divider between items, like the design frame. */
+.stat + .stat {
+  border-left: 1px solid var(--line);
+  padding-left: 32px;
 }
 
 .stat__icon {
   display: inline-flex;
   color: var(--orange);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .stat__icon svg {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
 }
 
 .stat__value {
@@ -302,7 +308,7 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
 }
 
 .value {
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-border-subtle, rgba(243, 217, 191, 1));
   border-radius: var(--radius);
   padding: 30px 28px;
   background: #fff;
@@ -382,7 +388,6 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
 @media (max-width: 980px) {
   .story {
     min-height: 0;
-    margin-bottom: 40px;
   }
   .story__inner {
     display: block;
@@ -392,8 +397,21 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
     max-width: none;
     padding: 56px 0 28px;
   }
+  .stats-band {
+    padding: 56px 0;
+  }
   .stats {
     grid-template-columns: 1fr 1fr;
+    gap: 36px 28px;
+  }
+  /* 2-col layout: only the second column keeps a divider. */
+  .stat + .stat {
+    border-left: none;
+    padding-left: 0;
+  }
+  .stat:nth-child(even) {
+    border-left: 1px solid var(--line);
+    padding-left: 28px;
   }
   .values {
     grid-template-columns: 1fr;
@@ -428,6 +446,11 @@ const values = computed(() => t('aboutP.values').map((v, i) => ({ ...v, icon: va
 @media (max-width: 560px) {
   .stats {
     grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .stat:nth-child(even) {
+    border-left: none;
+    padding-left: 0;
   }
 }
 </style>
