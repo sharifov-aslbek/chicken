@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: caravan-chicken:latest
+    container_name: caravan-chicken
+    # Bind to localhost only — host nginx proxies to it, so it must
+    # not be reachable directly from the public internet.
+    ports:
+      - "127.0.0.1:8080:80"
+    restart: unless-stopped
