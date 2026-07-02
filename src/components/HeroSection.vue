@@ -1,10 +1,25 @@
 <script setup>
-import heroImgMobile from '../assets/images/hero-mobile.png'
-import { computed } from 'vue'
+import heroBanner1 from '../assets/images/hero/Asosiy Baner.png'
+import heroBanner2 from '../assets/images/hero/Asosiy Baner 2.png'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '../i18n/index.js'
 
 const { t } = useI18n()
 const tags = computed(() => t('hero.tags'))
+
+// Hero slideshow: full-size banners clipped to the Union.png curve via
+// CSS mask; layers crossfade every 5 seconds.
+const banners = [heroBanner1, heroBanner2]
+const activeBanner = ref(0)
+let bannerTimer = null
+
+onMounted(() => {
+  bannerTimer = setInterval(() => {
+    activeBanner.value = (activeBanner.value + 1) % banners.length
+  }, 5000)
+})
+
+onBeforeUnmount(() => clearInterval(bannerTimer))
 </script>
 
 <template>
@@ -39,7 +54,13 @@ const tags = computed(() => t('hero.tags'))
       </div>
 
       <div class="hero__media" role="img" aria-label="Caravan Chicken ishchisi va jo'ja">
-        <img class="hero__img--mobile" :src="heroImgMobile" alt="Caravan Chicken ishchisi va jo'ja" />
+        <div
+          v-for="(banner, i) in banners"
+          :key="banner"
+          class="hero__slide"
+          :class="{ 'hero__slide--active': i === activeBanner }"
+          :style="{ backgroundImage: `url(${banner})` }"
+        ></div>
       </div>
     </div>
   </section>
@@ -110,31 +131,119 @@ const tags = computed(() => t('hero.tags'))
   gap: 14px;
 }
 
-/* Decorative photo lives as a right-anchored background that fills the hero
-   height. The PNG has ~38% transparent padding at the bottom, so the
-   background is oversized (auto 165%) and pinned to the top — the empty
-   bottom falls outside the box, leaving the photo flush with the hero edge. */
+/* The curved silhouette comes from Union.png's alpha channel used as a CSS
+   mask (same sizing the old background had: the PNG has ~38% transparent
+   padding at the bottom, so the mask is oversized and pinned to the top).
+   Full-size banner slides underneath get clipped to that curve. */
 .hero__media {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   width: 60%;
-  background-image: url('../assets/images/Union.png');
-  background-repeat: no-repeat;
+  /* Decorative only — never block clicks on hero text/buttons beneath. */
+  pointer-events: none;
+  -webkit-mask-image: url('../assets/images/Union.png');
+  mask-image: url('../assets/images/Union.png');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: right top;
+  mask-position: right top;
+  -webkit-mask-size: auto 188%;
+  mask-size: auto 188%;
+}
+
+.hero__slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  /* The subject stands in the right ~40% of both banners — pin the right
+     edge so he stays fully inside the curve at any viewport width. */
   background-position: right top;
-  background-size: auto 188%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.2s ease;
 }
 
-.hero__img--mobile {
-  display: none;
+/* Desktop, second banner: zoom while keeping the right edge anchored — the
+   subject slides left inside the frame (the image's left slice drops out)
+   and his right side stays uncut. */
+@media (min-width: 981px) {
+  .hero__slide:nth-child(2) {
+    background-size: auto 118%;
+  }
 }
 
-/* Tablet / narrow desktop: shrink the photo so it no longer overlaps the
-   hero title before the mobile layout kicks in. */
-@media (max-width: 1240px) and (min-width: 981px) {
+/* Incoming slide settles from a slight zoom (finishes before the next swap
+   so the outgoing layer fades out without a transform jump). */
+.hero__slide--active {
+  opacity: 1;
+  animation: hero-slide-zoom 4.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hero-slide-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__slide {
+    transition: opacity 0.4s ease;
+  }
+
+  .hero__slide--active {
+    animation: none;
+  }
+}
+
+/* Ultra-wide viewports (browser zoomed out, e.g. 25%): render the hero as a
+   centered 1472px design canvas — the photo pulls in from the viewport edge
+   by the excess, so it stays next to the text instead of stretching away.
+   Below 1472px the offset is 0, so desktop→mobile styles are untouched. */
+@media (min-width: 1472px) {
   .hero__media {
-    width: 46%;
+    right: calc((100vw - 1472px) / 2);
+    /* 60% of the 1472px canvas — keeps the cover crop identical to how the
+       photo renders on a regular desktop instead of zooming in. */
+    width: 883px;
+  }
+}
+
+/* Narrow desktop / tablet-landscape: scale the whole hero proportionally
+   (788px tall at the 1472px canvas → 53.5vw). The mask tracks the hero
+   height, so the photo keeps the exact desktop composition, just smaller —
+   no straight clipped edges or tight crops. */
+@media (max-width: 1471px) and (min-width: 981px) {
+  /* Everything below is the 1472px desktop canvas expressed in vw
+     (value / 14.72), so the hero renders as a proportionally scaled-down
+     desktop — photo, type and spacing shrink together. */
+  .hero {
+    height: 53.5vw; /* 788px */
+  }
+
+  .hero__grid {
+    padding-top: 7.5vw; /* 110px */
+  }
+
+  .hero__content {
+    max-width: 40.8vw; /* 600px */
+    padding: 2.7vw 0; /* 40px */
+  }
+
+  .hero__title {
+    font-size: 3.8vw; /* 56px */
+    max-width: 41.3vw; /* 608px */
+    margin: 0.95vw 0 1.6vw; /* 14px 24px */
+  }
+
+  .hero__lead {
+    font-size: clamp(14px, 1.22vw, 18px);
+    max-width: 36.7vw; /* 540px */
+    margin-bottom: 2.4vw; /* 36px */
   }
 }
 
@@ -156,8 +265,14 @@ const tags = computed(() => t('hero.tags'))
     position: relative;
     width: 100%;
     height: 420px;
+    -webkit-mask-position: center top;
+    mask-position: center top;
+    -webkit-mask-size: cover;
+    mask-size: cover;
+  }
+
+  .hero__slide {
     background-position: center top;
-    background-size: cover;
   }
 }
 
@@ -170,7 +285,7 @@ const tags = computed(() => t('hero.tags'))
 
   .hero__content {
     max-width: 100%;
-    padding: 8px 0 0;
+    padding: 13px 0 0;
   }
 
   .hero__title {
@@ -219,11 +334,32 @@ const tags = computed(() => t('hero.tags'))
     margin-top: 2px;
   }
 
+  /* Mobile: the curve comes from hero-mobile.png's alpha channel. The box
+     keeps that PNG's native aspect ratio and the mask stretches with it, so
+     the shape scales to any width instead of getting cropped. */
   .hero__media {
     height: auto;
-    margin: 28px -24px 0;
+    aspect-ratio: 375 / 538;
+    /* The mask's top-left arc is transparent, so pull the box up under the
+       actions to keep the visible photo close to the "Sotib olish" link;
+       pointer-events off so the invisible overlap can't block taps. */
+    margin: -48px -24px 0;
     width: calc(100% + 48px);
-    background-image: none;
+    pointer-events: none;
+    -webkit-mask-image: url('../assets/images/hero-mobile.png');
+    mask-image: url('../assets/images/hero-mobile.png');
+    -webkit-mask-position: top;
+    mask-position: top;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+  }
+
+  /* Zoom in slightly and nudge the photo down so the man's cap clears the
+     curve's transparent top edge; the man sits in the right ~40% of both
+     banners, so anchor the crop window there. */
+  .hero__slide {
+    background-size: auto 112%;
+    background-position: 78% 40px;
   }
 
   .hero__img--mobile {
