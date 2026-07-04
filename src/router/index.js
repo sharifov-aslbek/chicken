@@ -12,6 +12,7 @@ const routes = [
   { path: '/biz-haqimizda', name: 'about', component: AboutPage },
   { path: '/boglanish', name: 'contact', component: ContactPage },
   { path: '/connect', redirect: '/boglanish' },
+  { path: '/index.html' , redirect: '/#'  }
 ]
 
 const router = createRouter({
