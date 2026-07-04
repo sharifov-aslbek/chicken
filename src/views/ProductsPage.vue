@@ -8,7 +8,7 @@ import { mediaUrl } from '../utils/media.js'
 
 const { t, locale } = useI18n()
 const store = useOverallStore()
-const { category, products } = storeToRefs(store)
+const { category, products, productsLoading } = storeToRefs(store)
 
 // API text fields are { uz, ru, en } objects — pick the active locale, fall back to UZ.
 function tr(field) {
@@ -82,15 +82,35 @@ watch(activeIndex, loadProducts)
         </button>
       </div>
 
-      <transition-group name="card-list" tag="div" class="cards">
+      <!-- Skeleton grid while a tab's products are being fetched -->
+      <div v-if="productsLoading" class="cards" aria-hidden="true">
+        <div v-for="n in 8" :key="n" class="card skel-card">
+          <div class="card__media skel"></div>
+          <div class="card__body">
+            <div class="skel skel--chip"></div>
+            <div class="skel skel--title"></div>
+            <div class="skel skel--text"></div>
+            <div class="skel skel--link"></div>
+          </div>
+        </div>
+      </div>
+
+      <transition-group v-else name="card-list" tag="div" class="cards">
         <router-link
           v-for="p in visible"
           :key="p.id"
           :to="`/mahsulotlar/${p.id}`"
           class="card"
         >
-          <div class="card__media field-ph">
-            <img v-if="p.image" :src="mediaUrl(p.image)" :alt="tr(p.title)" class="card__img" />
+          <div class="card__media field-ph" :class="{ skel: p.image }">
+            <img
+              v-if="p.image"
+              :src="mediaUrl(p.image)"
+              :alt="tr(p.title)"
+              class="card__img"
+              @load="$event.target.classList.add('card__img--loaded'); $event.target.parentElement.classList.remove('skel')"
+              @error="$event.target.parentElement.classList.remove('skel')"
+            />
             <svg v-else class="field-ph__icon" viewBox="0 0 24 24" fill="none">
               <path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -230,6 +250,12 @@ watch(activeIndex, loadProducts)
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.card__img--loaded {
+  opacity: 1;
 }
 
 .card__body {
@@ -286,21 +312,71 @@ watch(activeIndex, loadProducts)
   height: 34px;
 }
 
-/* filter transition */
-.card-list-enter-active,
-.card-list-leave-active {
+/* Skeleton shimmer — loading cards and image placeholders.
+   Kept after .field-ph so the shimmer wins on elements with both classes. */
+.skel {
+  background: linear-gradient(
+    90deg,
+    var(--card-cream) 25%,
+    #f7ead9 45%,
+    var(--card-cream) 65%
+  );
+  background-size: 300% 100%;
+  animation: skel-shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes skel-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+.skel-card {
+  pointer-events: none;
+}
+
+.skel--chip,
+.skel--title,
+.skel--text,
+.skel--link {
+  border-radius: var(--radius-pill);
+}
+
+.skel--chip {
+  width: 40%;
+  height: 24px;
+  margin-bottom: 12px;
+}
+
+.skel--title {
+  width: 75%;
+  height: 18px;
+  margin-bottom: 10px;
+}
+
+.skel--text {
+  width: 90%;
+  height: 14px;
+  margin-bottom: 18px;
+}
+
+.skel--link {
+  width: 45%;
+  height: 14px;
+}
+
+/* filter transition — enter only; the skeleton grid covers the swap, and a
+   leave animation with position:absolute made grid cards (and their images)
+   balloon to natural size mid-switch. */
+.card-list-enter-active {
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 .card-list-enter-from {
   opacity: 0;
   transform: translateY(18px) scale(0.97);
-}
-.card-list-leave-to {
-  opacity: 0;
-  transform: scale(0.96);
-}
-.card-list-leave-active {
-  position: absolute;
 }
 
 .cta {
@@ -379,7 +455,8 @@ watch(activeIndex, loadProducts)
     margin-bottom: 10px;
   }
   /* Cards stay compact on mobile — drop the description line. */
-  .card__text {
+  .card__text,
+  .skel--text {
     display: none;
   }
   .card__link {

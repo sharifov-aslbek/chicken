@@ -13,7 +13,7 @@ export const messages = {
 
     hero: {
       tags: ['Halol', 'Pokiza', 'Tez'],
-      title: "Jo'jalikdan boshlab barcha jarayonlar bizning nazoratda!",
+      title: "Jo'jalikdan boshlab —\nbarcha jarayonlar\nnazoratimizda!",
       lead: 'Caravan Chicken — restoran, kafe, fastfood va oila dasturxoni uchun sifatli, halol va pokiza tovuq mahsulotlarini ishlab chiqaruvchi hamda yirik hajmda yetkazib beruvchi kompaniya.',
       viewProducts: "Mahsulotlarni ko'rish",
       buy: 'Sotib olish',
@@ -224,7 +224,7 @@ export const messages = {
 
     hero: {
       tags: ['Халяль', 'Чисто', 'Быстро'],
-      title: 'От инкубатора и до стола — все процессы под нашим контролем!',
+      title: 'Начиная с цыплёнка —\nвсе процессы под нашим\nконтролем!',
       lead: 'Caravan Chicken — компания, которая производит качественную, халяльную и чистую куриную продукцию для ресторанов, кафе, фастфуда и домашнего стола, а также поставляет её оптом.',
       viewProducts: 'Смотреть продукцию',
       buy: 'Купить',
@@ -435,7 +435,7 @@ export const messages = {
 
     hero: {
       tags: ['Halal', 'Clean', 'Fast'],
-      title: 'From hatchery onward — every process under our control!',
+      title: 'From chick to finish —\nevery process is under\nour control!',
       lead: 'Caravan Chicken is a company that produces high-quality, halal and clean chicken products for restaurants, cafés, fast food and family tables — and delivers them at scale.',
       viewProducts: 'View products',
       buy: 'Buy now',
