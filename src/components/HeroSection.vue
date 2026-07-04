@@ -42,8 +42,8 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
         </p>
 
         <div v-reveal="240" class="hero__actions">
-          <a href="#partner" class="btn btn-soft">{{ t('nav.partner') }}</a>
-          <a href="#products" class="btn btn-white">{{ t('hero.viewProducts') }}</a>
+          <router-link to="/boglanish" class="btn btn-soft">{{ t('nav.partner') }}</router-link>
+          <router-link to="/mahsulotlar" class="btn btn-white">{{ t('hero.viewProducts') }}</router-link>
           <a href="#buy" class="btn btn-ghost">
             {{ t('hero.buy') }}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -114,6 +114,8 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   letter-spacing: -0.02em;
   max-width: 608px;
   margin-bottom: 24px;
+  /* Titles in messages.js carry manual \n line breaks. */
+  white-space: pre-line;
 }
 
 .hero__lead {

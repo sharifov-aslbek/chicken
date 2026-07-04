@@ -9,6 +9,7 @@ export const useOverallStore = defineStore('overall', () => {
   const product = ref(null)
   const products = ref([])
   const productsTotal = ref(0)
+  const productsLoading = ref(false)
 
   // Track in-flight requests so duplicate concurrent calls (e.g. HomePage and
   // ProductsSection both mounting) reuse the same promise instead of refetching.
@@ -85,6 +86,7 @@ export const useOverallStore = defineStore('overall', () => {
   // Catalog list with optional category / search / pagination filters.
   async function getProducts({ category_id, search, skip = 0, limit = 20 } = {}) {
     lastProductsFetch = () => getProducts({ category_id, search, skip, limit })
+    productsLoading.value = true
     try {
       const response = await axios.get("https://caravanchicken.uz/api/products", {
         params: { lang: locale.value, category_id, search, skip, limit },
@@ -97,6 +99,8 @@ export const useOverallStore = defineStore('overall', () => {
       }
     } catch (error) {
       console.log("error", error.message)
+    } finally {
+      productsLoading.value = false
     }
   }
 
@@ -104,6 +108,7 @@ export const useOverallStore = defineStore('overall', () => {
   // Products belonging to a single category (dedicated endpoint).
   async function getCategoryProducts(categoryId, { skip = 0, limit = 20 } = {}) {
     lastProductsFetch = () => getCategoryProducts(categoryId, { skip, limit })
+    productsLoading.value = true
     try {
       const response = await axios.get(`https://caravanchicken.uz/api/categories/${categoryId}/products`, {
         params: { lang: locale.value, skip, limit },
@@ -116,6 +121,8 @@ export const useOverallStore = defineStore('overall', () => {
       }
     } catch (error) {
       console.log("error", error.message)
+    } finally {
+      productsLoading.value = false
     }
   }
 
@@ -136,6 +143,6 @@ export const useOverallStore = defineStore('overall', () => {
     home, getHome,
     category, getCategories,
     product, getProduct,
-    products, productsTotal, getProducts, getCategoryProducts,
+    products, productsTotal, productsLoading, getProducts, getCategoryProducts,
   }
 })
