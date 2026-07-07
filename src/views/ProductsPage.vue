@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import productImg from '../assets/images/StaticProduct.png'
@@ -55,10 +55,14 @@ function applyQueryCategory() {
   return true
 }
 
-onMounted(async () => {
+// Runs during setup (not onMounted) so a cached-categories visit flips
+// productsLoading before the first render — the skeleton grid shows
+// immediately instead of an empty cards area for a frame.
+async function init() {
   if (!category.value) await store.getCategories()
   if (!applyQueryCategory()) loadProducts()
-})
+}
+init()
 
 watch(activeIndex, loadProducts)
 watch(() => route.query.category, applyQueryCategory)
@@ -104,8 +108,8 @@ watch(() => route.query.category, applyQueryCategory)
         </div>
       </Transition>
 
-      <!-- Skeleton grid while a tab's products are being fetched -->
-      <div v-if="productsLoading" class="cards cards--skel" aria-hidden="true">
+      <!-- Skeleton grid while categories or a tab's products are being fetched -->
+      <div v-if="productsLoading || !category" class="cards cards--skel" aria-hidden="true">
         <div v-for="n in 8" :key="n" class="card skel-card">
           <div class="card__media skel"></div>
           <div class="card__body">
