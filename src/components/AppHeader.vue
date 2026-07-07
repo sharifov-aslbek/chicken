@@ -31,6 +31,8 @@ const currentLang = computed(() => locales.find((l) => l.code === locale.value)?
 function chooseLang(code) {
   setLocale(code)
   langOpen.value = false
+  // Also collapse the mobile burger menu when a language is picked there.
+  open.value = false
 }
 
 // Close the language dropdown when clicking anywhere outside it.

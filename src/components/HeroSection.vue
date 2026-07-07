@@ -96,6 +96,7 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  padding-top: 5px;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -322,13 +323,22 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   }
 
   .hero__title {
-    font-size: 34px;
+    /* Proportional to the viewport so the desktop (608px canvas) composition
+       is preserved on every phone: exactly 34px at 375px, scaling the same
+       way above and below (9.07vw = 34/375). */
+    font-size: 9.07vw;
     font-weight: 800;
-    line-height: 38px;
+    line-height: 1.12;
     letter-spacing: -0.01em;
     width: 100%;
     height: auto;
     margin-bottom: 20px;
+  }
+
+  /* Eyebrow follows the same proportion: 13px at 375px, capped at its
+     regular 14px so wider phones don't overshoot. */
+  .hero__eyebrow {
+    font-size: min(3.47vw, 14px);
   }
 
   .hero__lead {
@@ -400,6 +410,26 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
     position: relative;
     width: 100%;
     height: auto;
+  }
+}
+
+/* Phone-width title steps: 551–640px keeps the proportional 9.07vw, then
+   550–450px → 37px, 449–441px → 34px (bridge), 440px and below → 30px. */
+@media (max-width: 550px) {
+  .hero__title {
+    font-size: 37px;
+  }
+}
+
+@media (max-width: 449px) {
+  .hero__title {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 440px) {
+  .hero__title {
+    font-size: 30px;
   }
 }
 </style>
