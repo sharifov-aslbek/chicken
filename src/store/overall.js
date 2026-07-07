@@ -27,7 +27,7 @@ export const useOverallStore = defineStore('overall', () => {
     homePromise = (async () => {
       try {
         const response = await axios.get("https://caravanchicken.uz/api/home", {
-          params: { lang: locale.value, limit_per_category: 5 },
+          params: { lang: locale.value, limit_per_category: 4 },
         })
         if (response.data != null) {
           home.value = response.data;
