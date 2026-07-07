@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import productImg from '../assets/images/StaticProduct.png'
 import { useI18n } from '../i18n/index.js'
@@ -7,6 +8,7 @@ import { useOverallStore } from '../store/overall.js'
 import { mediaUrl } from '../utils/media.js'
 
 const { t, locale } = useI18n()
+const route = useRoute()
 const store = useOverallStore()
 const { category, products, productsLoading } = storeToRefs(store)
 
@@ -40,12 +42,24 @@ function loadProducts() {
   }
 }
 
-onMounted(() => {
-  if (!category.value) store.getCategories()
-  loadProducts()
+// ?category=<id> (e.g. from the home section's "view all") pre-selects a tab.
+// Returns true when it changed the tab — the activeIndex watcher then fetches.
+function applyQueryCategory() {
+  const qid = Number(route.query.category)
+  if (!qid) return false
+  const idx = filters.value.findIndex((f) => f.id === qid)
+  if (idx <= 0 || idx === activeIndex.value) return false
+  activeIndex.value = idx
+  return true
+}
+
+onMounted(async () => {
+  if (!category.value) await store.getCategories()
+  if (!applyQueryCategory()) loadProducts()
 })
 
 watch(activeIndex, loadProducts)
+watch(() => route.query.category, applyQueryCategory)
 </script>
 
 <template>
@@ -70,20 +84,26 @@ watch(activeIndex, loadProducts)
 
     <!-- Catalog -->
     <div class="catalog container">
-      <div v-reveal class="filters">
-        <button
-          v-for="(c, i) in filters"
-          :key="i"
-          class="filter"
-          :class="{ 'filter--active': i === activeIndex }"
-          @click="activeIndex = i"
-        >
-          {{ c.name }}
-        </button>
-      </div>
+      <Transition name="swap" mode="out-in">
+        <!-- Pill skeletons while categories load -->
+        <div v-if="!category" key="skel" class="filters" aria-hidden="true">
+          <span v-for="n in 7" :key="n" class="filter skel skel--pill"></span>
+        </div>
+        <div v-else key="filters" v-reveal class="filters">
+          <button
+            v-for="(c, i) in filters"
+            :key="i"
+            class="filter"
+            :class="{ 'filter--active': i === activeIndex }"
+            @click="activeIndex = i"
+          >
+            {{ c.name }}
+          </button>
+        </div>
+      </Transition>
 
       <!-- Skeleton grid while a tab's products are being fetched -->
-      <div v-if="productsLoading" class="cards" aria-hidden="true">
+      <div v-if="productsLoading" class="cards cards--skel" aria-hidden="true">
         <div v-for="n in 8" :key="n" class="card skel-card">
           <div class="card__media skel"></div>
           <div class="card__body">
@@ -312,25 +332,21 @@ watch(activeIndex, loadProducts)
   height: 34px;
 }
 
-/* Skeleton shimmer — loading cards and image placeholders.
-   Kept after .field-ph so the shimmer wins on elements with both classes. */
+/* Skeleton pulse — loading cards and image placeholders. A soft opacity
+   breath that matches the page's fade-based reveal animations.
+   Kept after .field-ph so it wins on elements with both classes. */
 .skel {
-  background: linear-gradient(
-    90deg,
-    var(--card-cream) 25%,
-    #f7ead9 45%,
-    var(--card-cream) 65%
-  );
-  background-size: 300% 100%;
-  animation: skel-shimmer 1.3s ease-in-out infinite;
+  background: var(--card-cream);
+  animation: skel-pulse 1.4s ease-in-out infinite;
 }
 
-@keyframes skel-shimmer {
-  from {
-    background-position: 100% 0;
+@keyframes skel-pulse {
+  0%,
+  100% {
+    opacity: 1;
   }
-  to {
-    background-position: -100% 0;
+  50% {
+    opacity: 0.55;
   }
 }
 
@@ -366,6 +382,43 @@ watch(activeIndex, loadProducts)
 .skel--link {
   width: 45%;
   height: 14px;
+}
+
+.skel--pill {
+  width: 118px;
+  height: 38px;
+  padding: 0;
+  pointer-events: none;
+  border-radius: var(--radius-pill);
+}
+
+/* Smooth crossfade when skeletons swap with real content (and back). */
+.swap-enter-active,
+.swap-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.swap-enter-from,
+.swap-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* The skeleton grid eases in instead of popping; the real cards already
+   animate per-card via the card-list enter transition. */
+.cards--skel {
+  animation: cards-skel-in 0.25s ease both;
+}
+
+@keyframes cards-skel-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* filter transition — enter only; the skeleton grid covers the swap, and a

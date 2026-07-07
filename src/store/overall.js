@@ -7,6 +7,7 @@ export const useOverallStore = defineStore('overall', () => {
   const home = ref(null)
   const category = ref(null)
   const product = ref(null)
+  const productLoading = ref(false)
   const products = ref([])
   const productsTotal = ref(0)
   const productsLoading = ref(false)
@@ -68,6 +69,7 @@ export const useOverallStore = defineStore('overall', () => {
   async function getProduct(id) {
     currentProductId = id
     product.value = null
+    productLoading.value = true
     try {
       const response = await axios.get(`https://caravanchicken.uz/api/products/${id}`, {
         params: { lang: locale.value },
@@ -79,6 +81,8 @@ export const useOverallStore = defineStore('overall', () => {
       }
     } catch (error) {
       console.log("error", error.message)
+    } finally {
+      productLoading.value = false
     }
   }
 
@@ -142,7 +146,7 @@ export const useOverallStore = defineStore('overall', () => {
   return {
     home, getHome,
     category, getCategories,
-    product, getProduct,
+    product, productLoading, getProduct,
     products, productsTotal, productsLoading, getProducts, getCategoryProducts,
   }
 })

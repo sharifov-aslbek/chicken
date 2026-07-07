@@ -4,7 +4,7 @@ import heroBanner2 from '../assets/images/hero/Asosiy Baner 2.png'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '../i18n/index.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const tags = computed(() => t('hero.tags'))
 
 // Hero slideshow: full-size banners clipped to the Union.png curve via
@@ -23,7 +23,7 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 </script>
 
 <template>
-  <section id="home" class="hero">
+  <section id="home" class="hero" :class="{ 'hero--ru': locale === 'ru' }">
     <div class="container hero__grid">
       <div class="hero__content">
         <p v-reveal class="hero__eyebrow">
@@ -44,12 +44,12 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
         <div v-reveal="240" class="hero__actions">
           <router-link to="/boglanish" class="btn btn-soft">{{ t('nav.partner') }}</router-link>
           <router-link to="/mahsulotlar" class="btn btn-white">{{ t('hero.viewProducts') }}</router-link>
-          <a href="#buy" class="btn btn-ghost">
+          <router-link to="/boglanish" class="btn btn-ghost">
             {{ t('hero.buy') }}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-          </a>
+          </router-link>
         </div>
       </div>
 
@@ -77,7 +77,8 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 
 .hero__grid {
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
+  /* Fixed 608px text column — the title must render at exactly 608px. */
+  grid-template-columns: 608px 1fr;
   align-items: center;
   align-content: center;
   gap: 32px;
@@ -87,7 +88,7 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 }
 
 .hero__content {
-  max-width: 600px;
+  width: 608px;
   padding: 40px 0;
 }
 
@@ -112,10 +113,23 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   font-weight: 800;
   line-height: 1.02;
   letter-spacing: -0.02em;
-  max-width: 608px;
+  width: 608px;
   margin-bottom: 24px;
   /* Titles in messages.js carry manual \n line breaks. */
   white-space: pre-line;
+}
+
+/* RU copy runs longer — widen the title column to 658px on desktop only;
+   the other locales stay at 608px. */
+@media (min-width: 981px) {
+  .hero--ru .hero__grid {
+    grid-template-columns: 658px 1fr;
+  }
+
+  .hero--ru .hero__content,
+  .hero--ru .hero__title {
+    width: 658px;
+  }
 }
 
 .hero__lead {
@@ -228,18 +242,28 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   }
 
   .hero__grid {
+    grid-template-columns: 41.3vw 1fr; /* 608px */
     padding-top: 7.5vw; /* 110px */
   }
 
   .hero__content {
-    max-width: 40.8vw; /* 600px */
+    width: 41.3vw; /* 608px */
     padding: 2.7vw 0; /* 40px */
   }
 
   .hero__title {
     font-size: 3.8vw; /* 56px */
-    max-width: 41.3vw; /* 608px */
+    width: 41.3vw; /* 608px */
     margin: 0.95vw 0 1.6vw; /* 14px 24px */
+  }
+
+  .hero--ru .hero__grid {
+    grid-template-columns: 44.7vw 1fr; /* 658px */
+  }
+
+  .hero--ru .hero__content,
+  .hero--ru .hero__title {
+    width: 44.7vw; /* 658px */
   }
 
   .hero__lead {
@@ -260,7 +284,14 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   }
 
   .hero__content {
+    width: auto;
+    max-width: 608px;
     padding: 24px 0 0;
+  }
+
+  .hero__title {
+    width: auto;
+    max-width: 608px;
   }
 
   .hero__media {

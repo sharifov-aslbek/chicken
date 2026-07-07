@@ -45,6 +45,13 @@
     <div id="app-loader">
       <img src="/logo-loader.svg" alt="Caravan Chicken" />
     </div>
+    <script>
+      // Product detail pages render their own skeletons, so the logo loader
+      // is skipped there. Runs synchronously — removed before first paint.
+      if (/^\/mahsulotlar\/[^/]+/.test(location.pathname)) {
+        document.getElementById('app-loader').remove()
+      }
+    </script>
 
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>

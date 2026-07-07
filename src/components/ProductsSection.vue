@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from '../i18n/index.js'
 import videoImg from '../assets/images/VideoPlayer.png'
@@ -24,12 +24,43 @@ function tr(field) {
 }
 
 // Response is an array of categories, each holding its own products list.
-const categories = computed(() => home.value || [])
+// Tabs follow a fixed display order (by category id, stable across locales):
+// Muzlatilgan & Qadoqlangan, Sovutilgan & Qadoqlangan, Yarim tayyor,
+// Marinadlangan, Dudlangan, Yangi so'yilgan. Unknown ids go last, API order.
+const CATEGORY_ORDER = [4, 3, 1, 5, 6, 2]
+const rank = (c) => {
+  const i = CATEGORY_ORDER.indexOf(c.id)
+  return i === -1 ? CATEGORY_ORDER.length : i
+}
+const categories = computed(() => [...(home.value || [])].sort((a, b) => rank(a) - rank(b)))
 const filters = computed(() => categories.value.map((c) => tr(c.name)))
-const activeIndex = ref(0)
+const activeIndex = ref(0) // drives the pill highlight — updates instantly on click
+const shownIndex = ref(0) // drives the cards — deferred so the pill paints first
+
+// Initial load: no home feed yet — pills and cards render as skeletons.
+const loading = computed(() => !home.value)
+
+// Swapping all cards is a heavy re-render (images + reveal directives) that
+// would freeze the pill's color transition if done in the click frame. On
+// click the grid drops to lightweight skeleton cards, and the real cards
+// land only after the pill transition has finished.
+const swapping = ref(false)
+let swapTimer = null
+function select(i) {
+  if (i === activeIndex.value) return
+  activeIndex.value = i
+  swapping.value = true
+  clearTimeout(swapTimer)
+  swapTimer = setTimeout(() => {
+    shownIndex.value = i
+    swapping.value = false
+  }, 200)
+}
+
+onUnmounted(() => clearTimeout(swapTimer))
 
 // Cards = products of the currently selected category.
-const visible = computed(() => categories.value[activeIndex.value]?.products || [])
+const visible = computed(() => categories.value[shownIndex.value]?.products || [])
 </script>
 
 <template>
@@ -59,22 +90,43 @@ const visible = computed(() => categories.value[activeIndex.value]?.products || 
         </router-link>
       </div>
 
-      <div v-reveal class="filters">
-        <button
-          v-for="(f, i) in filters"
-          :key="i"
-          class="filter"
-          :class="{ 'filter--active': i === activeIndex }"
-          @click="activeIndex = i"
-        >
-          {{ f }}
-        </button>
+      <Transition name="swap" mode="out-in">
+        <!-- Pill skeletons while the home feed loads -->
+        <div v-if="loading" key="skel" class="filters" aria-hidden="true">
+          <span v-for="n in 6" :key="n" class="filter skel skel--pill"></span>
+        </div>
+        <div v-else key="filters" v-reveal class="filters">
+          <button
+            v-for="(f, i) in filters"
+            :key="i"
+            class="filter"
+            :class="{ 'filter--active': i === activeIndex }"
+            @click="select(i)"
+          >
+            {{ f }}
+          </button>
+        </div>
+      </Transition>
+
+      <!-- Card skeletons: initial load + the brief window during a tab swap.
+           The out-in crossfade keeps both directions of the swap smooth. -->
+      <Transition name="swap" mode="out-in">
+      <div v-if="loading || swapping" key="skel" class="cards" aria-hidden="true">
+        <div v-for="n in 4" :key="n" class="card skel-card">
+          <div class="card__media skel"></div>
+          <div class="card__body">
+            <div class="skel skel--chip"></div>
+            <div class="skel skel--title"></div>
+            <div class="skel skel--text"></div>
+            <div class="skel skel--link"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="cards">
+      <div v-else key="cards" class="cards">
         <article v-for="(p, i) in visible" :key="p.id" v-scroll3d class="card">
           <div v-reveal3d.pop class="card__media img-ph">
-            <img v-if="p.image" :src="mediaUrl(p.image)" :alt="tr(p.title)" class="card__img" />
+            <img v-if="p.image" :src="mediaUrl(p.image)" :alt="tr(p.title)" class="card__img" decoding="async" loading="lazy" />
             <svg v-else class="card__ph-icon" viewBox="0 0 24 24" fill="none">
               <path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -92,6 +144,7 @@ const visible = computed(() => categories.value[activeIndex.value]?.products || 
           </div>
         </article>
       </div>
+      </Transition>
     </div>
   </section>
 </template>
@@ -174,22 +227,99 @@ const visible = computed(() => categories.value[activeIndex.value]?.products || 
   padding: 10px 20px;
   border-radius: var(--radius-pill);
   background: var(--card-cream);
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .filter:hover {
   background: #f7e2cf;
 }
 
+.filter:active {
+  transform: scale(0.95);
+}
+
 .filter--active {
   background: var(--orange);
   color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(255, 84, 10, 0.25);
 }
 
 .cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
+}
+
+/* Smooth crossfade when skeletons swap with real content (and back). */
+.swap-enter-active,
+.swap-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.swap-enter-from,
+.swap-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Skeleton pulse — a soft opacity breath that matches the page's
+   fade-based reveal animations. */
+.skel {
+  background: var(--card-cream);
+  animation: skel-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skel-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skel--pill {
+  width: 118px;
+  height: 38px;
+  padding: 0;
+  pointer-events: none;
+}
+
+.skel-card {
+  pointer-events: none;
+}
+
+.skel--chip,
+.skel--title,
+.skel--text,
+.skel--link {
+  border-radius: var(--radius-pill);
+}
+
+.skel--chip {
+  width: 40%;
+  height: 24px;
+  margin-bottom: 12px;
+}
+
+.skel--title {
+  width: 75%;
+  height: 18px;
+  margin-bottom: 10px;
+}
+
+.skel--text {
+  width: 90%;
+  height: 14px;
+  margin-bottom: 18px;
+}
+
+.skel--link {
+  width: 45%;
+  height: 14px;
 }
 
 .card {

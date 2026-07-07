@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import productImg from '../assets/images/StaticProduct.png'
@@ -10,7 +10,7 @@ import { mediaUrl } from '../utils/media.js'
 const { t, locale } = useI18n()
 const route = useRoute()
 const store = useOverallStore()
-const { product, home } = storeToRefs(store)
+const { product, productLoading, home } = storeToRefs(store)
 
 // API text fields are { uz, ru, en } objects — pick the active locale, fall back to UZ.
 function tr(field) {
@@ -55,7 +55,10 @@ function load() {
   if (!home.value) store.getHome()
 }
 
-onMounted(load)
+// Fetch during setup (not onMounted) so the very first render already has
+// productLoading=true and shows the skeleton — otherwise the empty content
+// branch flashes for a frame (or stale data from a previously viewed product).
+load()
 // Refetch when navigating between products.
 watch(() => route.params.slug, load)
 
@@ -74,16 +77,54 @@ const badges = computed(() => [
         <span>›</span>
         <router-link to="/mahsulotlar">{{ t('nav.products') }}</router-link>
         <span>›</span>
-        <span class="crumbs__current">{{ tr(product?.title) }}</span>
+        <Transition name="swap" mode="out-in">
+          <span v-if="productLoading" key="skel" class="skel skel--crumb" aria-hidden="true"></span>
+          <span v-else key="name" class="crumbs__current">{{ tr(product?.title) }}</span>
+        </Transition>
       </nav>
 
+      <!-- Skeleton: mirrors the top gallery + info layout while the product loads -->
+      <Transition name="swap" mode="out-in">
+      <div v-if="productLoading" key="skel" class="top top--skel" aria-hidden="true">
+        <div class="gallery">
+          <div class="gallery__stage skel"></div>
+          <div class="gallery__thumbs">
+            <div v-for="n in 4" :key="n" class="thumb skel"></div>
+          </div>
+        </div>
+
+        <div class="info">
+          <div class="skel skel--chip"></div>
+          <div class="skel skel--h1"></div>
+          <div class="skel skel--line"></div>
+          <div class="skel skel--line skel--line-short"></div>
+          <ul class="specs specs--skel">
+            <li v-for="n in 4" :key="n">
+              <span class="skel skel--spec-label"></span>
+              <span class="skel skel--spec-value"></span>
+            </li>
+          </ul>
+          <div class="price price--skel">
+            <span class="skel skel--eyebrow"></span>
+            <span class="skel skel--price"></span>
+            <div class="price__actions">
+              <span class="skel skel--btn"></span>
+              <span class="skel skel--btn"></span>
+            </div>
+          </div>
+          <div class="badges">
+            <span v-for="n in 2" :key="n" class="skel skel--badge"></span>
+          </div>
+        </div>
+      </div>
+
       <!-- Top: gallery + info -->
-      <div class="top">
+      <div v-else key="content" class="top">
         <div class="gallery">
           <div v-reveal3d.pop class="gallery__stage">
             <div class="gallery__track" :style="{ transform: `translateX(-${active * 100}%)` }">
               <div v-for="(img, i) in slides" :key="i" class="gallery__slide">
-                <img :src="img" :alt="tr(product?.title)" />
+                <img :src="img" :alt="tr(product?.title)" decoding="async" />
               </div>
             </div>
 
@@ -162,22 +203,42 @@ const badges = computed(() => [
           </div>
         </div>
       </div>
+      </Transition>
     </div>
 
     <!-- Detail block -->
     <div class="detail">
       <div class="container">
         <h2 v-reveal class="detail__title">{{ t('detail.aboutTitle') }}</h2>
-        <div v-reveal>
-          <p class="detail__text">{{ tr(product?.description) }}</p>
-        </div>
+        <Transition name="swap" mode="out-in">
+          <div v-if="productLoading" key="skel" aria-hidden="true">
+            <div class="skel skel--line"></div>
+            <div class="skel skel--line"></div>
+            <div class="skel skel--line skel--line-short"></div>
+          </div>
+          <div v-else key="text" v-reveal>
+            <p class="detail__text">{{ tr(product?.description) }}</p>
+          </div>
+        </Transition>
       </div>
     </div>
 
     <!-- Related -->
     <div class="related container">
       <h2 v-reveal class="related__title">{{ t('detail.relatedTitle') }}</h2>
-      <div class="cards">
+      <!-- Related cards wait on both the product and the home feed -->
+      <Transition name="swap" mode="out-in">
+      <div v-if="productLoading || !home" key="skel" class="cards" aria-hidden="true">
+        <div v-for="n in 4" :key="n" class="card skel-card">
+          <div class="card__media skel"></div>
+          <div class="card__body">
+            <div class="skel skel--chip"></div>
+            <div class="skel skel--line"></div>
+            <div class="skel skel--line skel--line-short"></div>
+          </div>
+        </div>
+      </div>
+      <div v-else key="cards" class="cards">
         <router-link
           v-for="(p, i) in related"
           :key="p.id"
@@ -186,7 +247,7 @@ const badges = computed(() => [
           class="card"
         >
           <div class="card__media">
-            <img :src="p.image ? mediaUrl(p.image) : productImg" :alt="tr(p.title)" />
+            <img :src="p.image ? mediaUrl(p.image) : productImg" :alt="tr(p.title)" decoding="async" loading="lazy" />
           </div>
           <div class="card__body">
             <span class="card__chip">{{ tr(p.category_name) }}</span>
@@ -201,6 +262,7 @@ const badges = computed(() => [
           </div>
         </router-link>
       </div>
+      </Transition>
     </div>
   </section>
 </template>
@@ -585,6 +647,164 @@ const badges = computed(() => [
 .field-ph__icon {
   width: 38px;
   height: 38px;
+}
+
+/* Smooth crossfade when skeletons swap with real content (and back).
+   Opacity only — the entrance direction comes from the column animations
+   below, matching the real content's side reveals. */
+.swap-enter-active,
+.swap-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.swap-enter-from,
+.swap-leave-to {
+  opacity: 0;
+}
+
+/* Skeleton columns arrive from the sides, exactly like the real content:
+   gallery from the left, info from the right (42px / 0.7s, same curve as
+   the v-reveal directives). */
+.top--skel {
+  --skel-slide: 42px;
+}
+
+.top--skel .gallery {
+  animation: skel-from-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.top--skel .info {
+  animation: skel-from-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes skel-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-1 * var(--skel-slide)));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes skel-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(var(--skel-slide));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Match style.css: shrink the slide offset within the container padding. */
+@media (max-width: 640px) {
+  .top--skel {
+    --skel-slide: 20px;
+  }
+}
+
+/* Skeleton pulse — a soft opacity breath that matches the page's
+   fade-based reveal animations. */
+.skel {
+  background: var(--card-cream);
+  animation: skel-pulse 1.4s ease-in-out infinite;
+  border-radius: var(--radius-pill);
+  display: block;
+}
+
+@keyframes skel-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skel--crumb {
+  display: inline-block;
+  width: 140px;
+  height: 14px;
+}
+
+.gallery__stage.skel {
+  border-radius: var(--radius);
+}
+
+.thumb.skel {
+  border-radius: var(--radius-sm);
+}
+
+.skel-card {
+  pointer-events: none;
+}
+
+.card__media.skel {
+  border-radius: 0;
+}
+
+.skel--chip {
+  width: 110px;
+  height: 28px;
+  margin-bottom: 16px;
+}
+
+.skel--h1 {
+  width: 70%;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.skel--line {
+  width: 100%;
+  height: 14px;
+  margin-bottom: 12px;
+}
+
+.skel--line-short {
+  width: 60%;
+  margin-bottom: 28px;
+}
+
+.specs--skel li {
+  align-items: center;
+}
+
+.skel--spec-label {
+  width: 30%;
+  height: 13px;
+}
+
+.skel--spec-value {
+  width: 22%;
+  height: 13px;
+}
+
+.price--skel .skel--eyebrow {
+  width: 130px;
+  height: 12px;
+  margin-bottom: 12px;
+}
+
+.price--skel .skel--price {
+  width: 180px;
+  height: 22px;
+  margin-bottom: 18px;
+}
+
+.skel--btn {
+  width: 150px;
+  height: 46px;
+}
+
+.skel--badge {
+  width: 140px;
+  height: 20px;
 }
 
 @media (max-width: 980px) {

@@ -19,7 +19,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) return savedPosition
+    // Restore scroll only for in-session back/forward. On the initial
+    // navigation (fresh open or refresh) `from` is empty — start at the top
+    // instead of the browser-remembered position.
+    if (savedPosition && from.matched.length) return savedPosition
     if (to.hash) return { el: to.hash, top: 90, behavior: 'smooth' }
     return { top: 0 }
   },
