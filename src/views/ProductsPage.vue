@@ -6,6 +6,7 @@ import productImg from '../assets/images/StaticProduct.png'
 import { useI18n } from '../i18n/index.js'
 import { useOverallStore } from '../store/overall.js'
 import { mediaUrl } from '../utils/media.js'
+import { sortCategories } from '../utils/categoryOrder.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -23,10 +24,11 @@ const allLabel = computed(
   () => ({ uz: 'Barchasi', ru: 'Все', en: 'All' }[locale.value] || 'Barchasi')
 )
 
-// "All" chip first, then one chip per API category.
+// "All" chip first, then one chip per API category — same fixed order as the
+// home page tabs.
 const filters = computed(() => [
   { id: null, name: allLabel.value },
-  ...(category.value || []).map((c) => ({ id: c.id, name: tr(c.name) })),
+  ...sortCategories(category.value).map((c) => ({ id: c.id, name: tr(c.name) })),
 ])
 const activeIndex = ref(0) // 0 = "All"
 

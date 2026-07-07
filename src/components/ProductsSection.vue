@@ -5,6 +5,7 @@ import { useI18n } from '../i18n/index.js'
 import videoImg from '../assets/images/VideoPlayer.png'
 import { useOverallStore } from '../store/overall.js'
 import { mediaUrl } from '../utils/media.js'
+import { sortCategories } from '../utils/categoryOrder.js'
 import { RouterLink } from 'vue-router'
 
 const { t, locale } = useI18n()
@@ -24,15 +25,8 @@ function tr(field) {
 }
 
 // Response is an array of categories, each holding its own products list.
-// Tabs follow a fixed display order (by category id, stable across locales):
-// Muzlatilgan & Qadoqlangan, Sovutilgan & Qadoqlangan, Yarim tayyor,
-// Marinadlangan, Dudlangan, Yangi so'yilgan. Unknown ids go last, API order.
-const CATEGORY_ORDER = [4, 3, 1, 5, 6, 2]
-const rank = (c) => {
-  const i = CATEGORY_ORDER.indexOf(c.id)
-  return i === -1 ? CATEGORY_ORDER.length : i
-}
-const categories = computed(() => [...(home.value || [])].sort((a, b) => rank(a) - rank(b)))
+// Tabs follow the fixed display order shared with the catalog page.
+const categories = computed(() => sortCategories(home.value))
 const filters = computed(() => categories.value.map((c) => tr(c.name)))
 const activeIndex = ref(0) // drives the pill highlight — updates instantly on click
 const shownIndex = ref(0) // drives the cards — deferred so the pill paints first
