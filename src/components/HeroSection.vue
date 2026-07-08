@@ -333,7 +333,7 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
     letter-spacing: -0.01em;
     width: 100%;
     height: auto;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .hero__eyebrow {
@@ -341,9 +341,8 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   }
 
   .hero__lead {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.6;
-    margin-top: 54px;
     margin-bottom: 28px;
   }
 
