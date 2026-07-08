@@ -295,6 +295,16 @@ const lightBar = computed(() => route.name === 'contact' || route.name === 'prod
     display: flex;
   }
 
+  /* Mobile design: logo renders at 36px (~127px wide) instead of 38px. */
+  .bar :deep(.brand__img) {
+    height: 36px;
+  }
+
+  .bar {
+    min-height: 78px;
+    padding: 5px 10px 5px 18px;
+  }
+
   .nav {
     position: absolute;
     top: calc(100% + 10px);

@@ -4,7 +4,7 @@ import heroBanner2 from '../assets/images/hero/Asosiy Baner 2.png'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '../i18n/index.js'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const tags = computed(() => t('hero.tags'))
 
 // Hero slideshow: full-size banners clipped to the Union.png curve via
@@ -23,7 +23,7 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 </script>
 
 <template>
-  <section id="home" class="hero" :class="{ 'hero--ru': locale === 'ru' }">
+  <section id="home" class="hero">
     <div class="container hero__grid">
       <div class="hero__content">
         <p v-reveal class="hero__eyebrow">
@@ -77,8 +77,8 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 
 .hero__grid {
   display: grid;
-  /* Fixed 608px text column — the title must render at exactly 608px. */
-  grid-template-columns: 608px 1fr;
+  /* Fixed 610px text column — the title must render at exactly 610px. */
+  grid-template-columns: 610px 1fr;
   align-items: center;
   align-content: center;
   gap: 32px;
@@ -88,7 +88,7 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 }
 
 .hero__content {
-  width: 608px;
+  width: 610px;
   padding: 40px 0;
 }
 
@@ -110,27 +110,14 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 }
 
 .hero__title {
-  font-size: 56px;
+  font-size: 49px;
   font-weight: 800;
   line-height: 1.02;
   letter-spacing: -0.02em;
-  width: 608px;
+  width: 610px;
   margin-bottom: 24px;
   /* Titles in messages.js carry manual \n line breaks. */
   white-space: pre-line;
-}
-
-/* RU copy runs longer — widen the title column to 658px on desktop only;
-   the other locales stay at 608px. */
-@media (min-width: 981px) {
-  .hero--ru .hero__grid {
-    grid-template-columns: 658px 1fr;
-  }
-
-  .hero--ru .hero__content,
-  .hero--ru .hero__title {
-    width: 658px;
-  }
 }
 
 .hero__lead {
@@ -243,28 +230,19 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   }
 
   .hero__grid {
-    grid-template-columns: 41.3vw 1fr; /* 608px */
+    grid-template-columns: 41.4vw 1fr; /* 610px */
     padding-top: 7.5vw; /* 110px */
   }
 
   .hero__content {
-    width: 41.3vw; /* 608px */
+    width: 41.4vw; /* 610px */
     padding: 2.7vw 0; /* 40px */
   }
 
   .hero__title {
-    font-size: 3.8vw; /* 56px */
-    width: 41.3vw; /* 608px */
+    font-size: 3.33vw; /* 49px */
+    width: 41.4vw; /* 610px */
     margin: 0.95vw 0 1.6vw; /* 14px 24px */
-  }
-
-  .hero--ru .hero__grid {
-    grid-template-columns: 44.7vw 1fr; /* 658px */
-  }
-
-  .hero--ru .hero__content,
-  .hero--ru .hero__title {
-    width: 44.7vw; /* 658px */
   }
 
   .hero__lead {
@@ -313,7 +291,10 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 @media (max-width: 640px) {
   .hero__grid {
     gap: 0;
-    padding-top: 96px;
+    /* Header is 94px tall on mobile (16px offset + 78px bar); 94px here
+       plus the 13px content padding and 5px eyebrow padding puts the
+       eyebrow 18px below the navbar. */
+    padding-top: 94px;
     padding-bottom: 0;
   }
 
@@ -335,15 +316,14 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
     margin-bottom: 20px;
   }
 
-  /* Eyebrow follows the same proportion: 13px at 375px, capped at its
-     regular 14px so wider phones don't overshoot. */
   .hero__eyebrow {
-    font-size: min(3.47vw, 14px);
+    font-size: 13px;
   }
 
   .hero__lead {
     font-size: 16px;
     line-height: 1.6;
+    margin-top: 54px;
     margin-bottom: 28px;
   }
 
