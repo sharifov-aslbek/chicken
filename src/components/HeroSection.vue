@@ -4,7 +4,7 @@ import heroBanner2 from '../assets/images/hero/Asosiy Baner 2.png'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '../i18n/index.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const tags = computed(() => t('hero.tags'))
 
 // Hero slideshow: full-size banners clipped to the Union.png curve via
@@ -23,7 +23,7 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 </script>
 
 <template>
-  <section id="home" class="hero">
+  <section id="home" class="hero" :class="{ 'hero--ru': locale === 'ru' }">
     <div class="container hero__grid">
       <div class="hero__content">
         <p v-reveal class="hero__eyebrow">
@@ -77,8 +77,8 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 
 .hero__grid {
   display: grid;
-  /* Fixed 610px text column — the title must render at exactly 610px. */
-  grid-template-columns: 610px 1fr;
+  /* Fixed 608px text column — the title must render at exactly 608px. */
+  grid-template-columns: 608px 1fr;
   align-items: center;
   align-content: center;
   gap: 32px;
@@ -88,8 +88,12 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 }
 
 .hero__content {
-  width: 610px;
+  width: 608px;
   padding: 40px 0;
+  /* Above the absolutely-positioned hero photo, so the RU title can
+     overflow onto it and stay readable. */
+  position: relative;
+  z-index: 1;
 }
 
 .hero__eyebrow {
@@ -110,14 +114,23 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 }
 
 .hero__title {
-  font-size: 49px;
+  font-size: 56px;
   font-weight: 800;
-  line-height: 1.02;
+  line-height: 1.0357; /* 3 lines × 58px = 174px title height */
   letter-spacing: -0.02em;
-  width: 610px;
+  width: 608px;
   margin-bottom: 24px;
   /* Titles in messages.js carry manual \n line breaks. */
   white-space: pre-line;
+}
+
+/* RU copy runs longer — the title alone widens to 682px on desktop and is
+   allowed to spill over the photo; lead and buttons stay in the 608px
+   column. */
+@media (min-width: 981px) {
+  .hero--ru .hero__title {
+    width: 682px;
+  }
 }
 
 .hero__lead {
@@ -230,19 +243,23 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   }
 
   .hero__grid {
-    grid-template-columns: 41.4vw 1fr; /* 610px */
+    grid-template-columns: 41.3vw 1fr; /* 608px */
     padding-top: 7.5vw; /* 110px */
   }
 
   .hero__content {
-    width: 41.4vw; /* 610px */
+    width: 41.3vw; /* 608px */
     padding: 2.7vw 0; /* 40px */
   }
 
   .hero__title {
-    font-size: 3.33vw; /* 49px */
-    width: 41.4vw; /* 610px */
+    font-size: 3.8vw; /* 56px */
+    width: 41.3vw; /* 608px */
     margin: 0.95vw 0 1.6vw; /* 14px 24px */
+  }
+
+  .hero--ru .hero__title {
+    width: 46.3vw; /* 682px */
   }
 
   .hero__lead {
@@ -269,6 +286,7 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
   }
 
   .hero__title {
+    font-size: 50px;
     width: auto;
     max-width: 608px;
   }
@@ -307,7 +325,9 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
     /* Proportional to the viewport so the desktop (608px canvas) composition
        is preserved on every phone: exactly 34px at 375px, scaling the same
        way above and below (9.07vw = 34/375). */
-    font-size: 9.07vw;
+    /* Capped at 44px so wide phones stay below the 50px tablet size —
+       without the cap 9.07vw hits ~58px near the 640px breakpoint. */
+    font-size: min(9.07vw, 44px);
     font-weight: 800;
     line-height: 1.12;
     letter-spacing: -0.01em;
@@ -394,14 +414,14 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 }
 
 /* Phone-width title steps: 551–640px keeps the proportional 9.07vw, then
-   550–450px → 37px, 449–441px → 34px (bridge), 440px and below → 30px. */
+   550–466px → 37px, 465–441px → 34px (bridge), 440px and below → 30px. */
 @media (max-width: 550px) {
   .hero__title {
     font-size: 37px;
   }
 }
 
-@media (max-width: 449px) {
+@media (max-width: 465px) {
   .hero__title {
     font-size: 34px;
   }
@@ -410,6 +430,12 @@ onBeforeUnmount(() => clearInterval(bannerTimer))
 @media (max-width: 440px) {
   .hero__title {
     font-size: 30px;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero__title {
+    font-size: 27px;
   }
 }
 </style>
