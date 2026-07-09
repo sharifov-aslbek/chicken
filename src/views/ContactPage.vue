@@ -1,9 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from '../i18n/index.js'
+import { useOverallStore } from '../store/overall.js'
+import { normalizePhone } from '../utils/phone.js'
 import AppIcon from '../components/AppIcon.vue'
 
 const { t } = useI18n()
+const store = useOverallStore()
 
 const role = ref('b2b')
 
@@ -15,9 +18,32 @@ const cardMeta = [
 ]
 const cards = computed(() => t('contactP.cards').map((c, i) => ({ ...c, ...cardMeta[i] })))
 
+const form = ref({ fullname: '', phone: '', company: '', description: '' })
+const sending = ref(false)
 const sent = ref(false)
-function onSubmit() {
-  sent.value = true
+const error = ref(false)
+
+async function onSubmit() {
+  if (sending.value) return
+  sending.value = true
+  sent.value = false
+  error.value = false
+  try {
+    await store.sendPartnership({
+      fullname: form.value.fullname.trim(),
+      phone_number: normalizePhone(form.value.phone),
+      company_name: form.value.company.trim(),
+      type: role.value === 'b2b' ? 'B2B' : 'B2C',
+      description: form.value.description.trim(),
+    })
+    sent.value = true
+    form.value = { fullname: '', phone: '', company: '', description: '' }
+    role.value = 'b2b'
+  } catch (e) {
+    error.value = true
+  } finally {
+    sending.value = false
+  }
 }
 </script>
 
@@ -59,17 +85,17 @@ function onSubmit() {
         <div class="form-row">
           <label class="field">
             <span class="field__label">{{ t('form.name') }}</span>
-            <input type="text" :placeholder="t('form.namePh')" required />
+            <input type="text" :placeholder="t('form.namePh')" v-model="form.fullname" required />
           </label>
           <label class="field">
             <span class="field__label">{{ t('form.phone') }}</span>
-            <input type="tel" placeholder="+998" required />
+            <input type="tel" placeholder="+998" v-model="form.phone" required />
           </label>
         </div>
 
         <label class="field">
           <span class="field__label">{{ t('form.company') }}</span>
-          <input type="text" :placeholder="t('form.companyPh')" />
+          <input type="text" :placeholder="t('form.companyPh')" v-model="form.company" />
         </label>
 
         <div class="field">
@@ -88,12 +114,17 @@ function onSubmit() {
 
         <label class="field">
           <span class="field__label">{{ t('form.comment') }}</span>
-          <textarea rows="4" :placeholder="t('form.commentPh')"></textarea>
+          <textarea rows="4" :placeholder="t('form.commentPh')" v-model="form.description"></textarea>
         </label>
 
-        <button type="submit" class="btn btn-primary form__submit">{{ t('form.submit') }}</button>
+        <button type="submit" class="btn btn-primary form__submit" :disabled="sending">
+          {{ sending ? t('form.sending') : t('form.submit') }}
+        </button>
         <transition name="fade">
           <p v-if="sent" class="form__ok">{{ t('contactP.ok') }}</p>
+        </transition>
+        <transition name="fade">
+          <p v-if="error" class="form__err">{{ t('form.err') }}</p>
         </transition>
       </form>
     </div>
@@ -324,12 +355,25 @@ function onSubmit() {
   margin-top: 4px;
 }
 
+.form__submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .form__ok {
   margin-top: 14px;
   text-align: center;
   font-size: 14px;
   font-weight: 600;
   color: var(--green-600);
+}
+
+.form__err {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #d63f26;
 }
 
 .map-wrap {

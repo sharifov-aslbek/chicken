@@ -1,16 +1,43 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from '../i18n/index.js'
+import { useOverallStore } from '../store/overall.js'
+import { normalizePhone } from '../utils/phone.js'
 
 const { t } = useI18n()
+const store = useOverallStore()
 
 const role = ref('restaurant')
 
 const icons = ['phone', 'send', 'instagram', 'clock']
 const contacts = computed(() => t('contact.list').map((text, i) => ({ icon: icons[i], text })))
 
-function onSubmit() {
-  // Placeholder — integration added later
+const form = ref({ fullname: '', phone: '', company: '', description: '' })
+const sending = ref(false)
+const sent = ref(false)
+const error = ref(false)
+
+async function onSubmit() {
+  if (sending.value) return
+  sending.value = true
+  sent.value = false
+  error.value = false
+  try {
+    await store.sendPartnership({
+      fullname: form.value.fullname.trim(),
+      phone_number: normalizePhone(form.value.phone),
+      company_name: form.value.company.trim(),
+      type: role.value === 'restaurant' ? 'B2B' : 'B2C',
+      description: form.value.description.trim(),
+    })
+    sent.value = true
+    form.value = { fullname: '', phone: '', company: '', description: '' }
+    role.value = 'restaurant'
+  } catch (e) {
+    error.value = true
+  } finally {
+    sending.value = false
+  }
 }
 </script>
 
@@ -52,17 +79,17 @@ function onSubmit() {
         <div class="form-row">
           <label class="field">
             <span class="field__label">{{ t('form.name') }}</span>
-            <input type="text" :placeholder="t('form.namePh')" />
+            <input type="text" :placeholder="t('form.namePh')" v-model="form.fullname" required />
           </label>
           <label class="field">
             <span class="field__label">{{ t('form.phone') }}</span>
-            <input type="tel" placeholder="+998" />
+            <input type="tel" placeholder="+998" v-model="form.phone" required />
           </label>
         </div>
 
         <label class="field">
           <span class="field__label">{{ t('form.company') }}</span>
-          <input type="text" :placeholder="t('form.companyPh')" />
+          <input type="text" :placeholder="t('form.companyPh')" v-model="form.company" />
         </label>
 
         <div class="field">
@@ -91,10 +118,18 @@ function onSubmit() {
 
         <label class="field">
           <span class="field__label">{{ t('form.comment') }}</span>
-          <textarea rows="4" :placeholder="t('form.commentPh')"></textarea>
+          <textarea rows="4" :placeholder="t('form.commentPh')" v-model="form.description"></textarea>
         </label>
 
-        <button type="submit" class="btn btn-primary contact__submit">{{ t('form.submit') }}</button>
+        <button type="submit" class="btn btn-primary contact__submit" :disabled="sending">
+          {{ sending ? t('form.sending') : t('form.submit') }}
+        </button>
+        <transition name="fade">
+          <p v-if="sent" class="contact__ok">{{ t('contact.ok') }}</p>
+        </transition>
+        <transition name="fade">
+          <p v-if="error" class="contact__err">{{ t('form.err') }}</p>
+        </transition>
         <p class="contact__note">{{ t('contact.note') }}</p>
       </form>
     </div>
@@ -276,6 +311,34 @@ function onSubmit() {
 .contact__submit {
   width: 100%;
   margin-top: 4px;
+}
+
+.contact__submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.contact__ok,
+.contact__err {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 14px;
+}
+
+.contact__ok {
+  color: var(--green-600);
+}
+
+.contact__err {
+  color: #b3200a;
+}
+
+.fade-enter-active {
+  transition: opacity 0.4s ease;
+}
+.fade-enter-from {
+  opacity: 0;
 }
 
 .contact__note {

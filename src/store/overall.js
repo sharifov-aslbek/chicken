@@ -131,6 +131,20 @@ export const useOverallStore = defineStore('overall', () => {
   }
 
 
+  // Partnership / order request from the contact forms. Throws on failure so
+  // the calling component can surface an error state to the user.
+  async function sendPartnership({ fullname, phone_number, company_name, type, description }) {
+    const response = await axios.post("https://caravanchicken.uz/api/partnership", {
+      fullname,
+      phone_number,
+      company_name,
+      type,
+      description,
+    })
+    return response.data
+  }
+
+
   function notFound() {
     console.log("data mavjud emasu");
   }
@@ -148,5 +162,6 @@ export const useOverallStore = defineStore('overall', () => {
     category, getCategories,
     product, productLoading, getProduct,
     products, productsTotal, productsLoading, getProducts, getCategoryProducts,
+    sendPartnership,
   }
 })

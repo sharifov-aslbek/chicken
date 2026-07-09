@@ -119,6 +119,7 @@ export const messages = {
       roleRestaurant: 'Restoran / Kafe',
       roleCustomer: 'Oddiy mijoz',
       note: "Ma'lumotlaringiz uchinchi shaxslarga berilmaydi.",
+      ok: "Rahmat! So'rovingiz qabul qilindi — tez orada bog'lanamiz.",
     },
 
     form: {
@@ -131,6 +132,8 @@ export const messages = {
       comment: "Izoh yoki so'rovingiz",
       commentPh: "Qo'shimcha ma'lumotlar...",
       submit: "So'rov yuborish",
+      sending: 'Yuborilmoqda...',
+      err: "Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
     },
 
     footer: {
@@ -330,6 +333,7 @@ export const messages = {
       roleRestaurant: 'Ресторан / Кафе',
       roleCustomer: 'Обычный клиент',
       note: 'Ваши данные не передаются третьим лицам.',
+      ok: 'Спасибо! Ваш запрос принят — мы скоро свяжемся с вами.',
     },
 
     form: {
@@ -342,6 +346,8 @@ export const messages = {
       comment: 'Комментарий или запрос',
       commentPh: 'Дополнительная информация...',
       submit: 'Отправить запрос',
+      sending: 'Отправка...',
+      err: 'Произошла ошибка. Пожалуйста, попробуйте снова.',
     },
 
     footer: {
@@ -541,6 +547,7 @@ export const messages = {
       roleRestaurant: 'Restaurant / Café',
       roleCustomer: 'Regular customer',
       note: 'Your information is not shared with third parties.',
+      ok: 'Thank you! Your request has been received — we will contact you shortly.',
     },
 
     form: {
@@ -553,6 +560,8 @@ export const messages = {
       comment: 'Comment or request',
       commentPh: 'Additional information...',
       submit: 'Send request',
+      sending: 'Sending...',
+      err: 'Something went wrong. Please try again.',
     },
 
     footer: {
